@@ -1,0 +1,24 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">#607D8B</item>
+        <item name="colorPrimaryDark">#455A64</item>
+        <item name="colorAccent">#00BCD4</item>
+        <item name="android:colorBackground">@android:color/background_light</item>
+        <item name="android:statusBarColor">?android:attr/colorPrimaryDark</item>
+        <item name="android:textColorPrimary">@android:color/primary_text_light</item>
+    </style>
+
+    <style name="AppTheme.TransTheme">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowCloseOnTouchOutside">false</item>
+
+    </style>
+
+    <style name="Fade_Animation">
+        <item name = "android:windowEnterAnimation">@anim/fade_out</item>
+        <item name="android:windowExitAnimation">@anim/fade_in</item>
+    </style>
+</resources>
