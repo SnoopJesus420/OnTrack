@@ -12,8 +12,6 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import net.zebra.ontrack.Screens.Dashboard;
 import net.zebra.ontrack.Screens.Home;
@@ -98,10 +96,10 @@ public class MainActivity extends AppCompatActivity {
         tbl = prefs.getString("timeBeforeLeave", "00:00:00");
         System.out.println(tbl);
         if (!tbl.contains("null")){
-            RecordedTime.setTime(tbl);
+            RecordedTime.addTime(tbl);
         }
         else
-            RecordedTime.setTime("There was an error setting the time");
+            RecordedTime.addTime("There was an error setting the time");
 
 
 
@@ -123,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         SharedPreferences.Editor e = prefs.edit();
-        e.putString("timeBeforeLeave", RecordedTime.getTime());
+        e.putString("timeBeforeLeave", RecordedTime.getTotalTime());
         e.apply();
 
 

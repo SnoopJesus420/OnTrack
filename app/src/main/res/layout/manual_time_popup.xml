@@ -4,20 +4,20 @@
     android:layout_height="match_parent">
 
     <RelativeLayout
-        android:layout_width="400dp"
-        android:layout_height="200dp"
-        android:background="@drawable/anotherpage">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="190dp"
-            android:layout_alignParentStart="true"
+        <LinearLayout
+            android:layout_width="400dp"
+            android:layout_height="200dp"
+            android:layout_margin="10dp"
+            android:background="@android:color/background_light"
+            android:elevation="6dp"
             android:orientation="vertical">
 
-
             <LinearLayout
-                android:layout_width="300dp"
-                android:layout_height="50dp"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
                 android:gravity="center_vertical|center_horizontal"
@@ -30,8 +30,8 @@
                     android:layout_weight="1"
                     android:ems="10"
                     android:gravity="center_horizontal"
-                    android:inputType="number"
-                    android:text="HH" />
+                    android:hint="HH"
+                    android:inputType="number" />
 
                 <TextView
                     android:id="@+id/textView"
@@ -49,8 +49,8 @@
                     android:layout_weight="1"
                     android:ems="10"
                     android:gravity="center_horizontal"
-                    android:inputType="number"
-                    android:text="MM" />
+                    android:hint="MM"
+                    android:inputType="number" />
 
                 <TextView
                     android:id="@+id/textView2"
@@ -68,18 +68,26 @@
                     android:layout_weight="1"
                     android:ems="10"
                     android:gravity="center_horizontal"
-                    android:inputType="number"
-                    android:text="SS" />
+                    android:hint="SS"
+                    android:inputType="number" />
+
             </LinearLayout>
 
-            <Button
-                android:id="@+id/doneButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_centerHorizontal="true"
-                android:text="Set" />
-        </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <Button
+                    android:id="@+id/manual_time_set_button"
+                    android:layout_width="200dp"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerHorizontal="true"
+                    android:layout_weight="1"
+                    android:text="Set" />
+            </RelativeLayout>
+
+        </LinearLayout>
 
     </RelativeLayout>
 

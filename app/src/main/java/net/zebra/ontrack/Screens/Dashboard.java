@@ -1,13 +1,12 @@
 package net.zebra.ontrack.Screens;
 
 import android.app.Fragment;
-import android.app.ProgressDialog;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -21,6 +20,7 @@ import net.zebra.ontrack.tools.RecordedTime;
 public class Dashboard extends Fragment {
     private TextView currenttime;
     private ProgressBar progressBar;
+    private Button notRegistered;
 
     @Nullable
     @Override
@@ -32,21 +32,7 @@ public class Dashboard extends Fragment {
 
         progressBar = (ProgressBar) v.findViewById(R.id.progressBar);
 
-
-        //time = RecordedTime.getTime();
-
-        /*String splitTime[] = newTime.split(":");
-
-        newMinutes = Integer.parseInt(splitTime[0]);
-        newSeconds = Integer.parseInt(splitTime[1]);
-
-        hours += newHours;
-        minutes += newMinutes;
-        seconds += newSeconds;
-
-        time = hours + ":" + minutes + ":" + seconds;*/
-
-        String t = clt + RecordedTime.getTime() ;
+        String t = clt + RecordedTime.getTotalTime() ;
         currenttime.setText(t);
 
         return v;

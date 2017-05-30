@@ -13,6 +13,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
+
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/stop_button"
                 android:layout_width="75dp"
@@ -20,11 +21,14 @@
                 android:layout_alignParentBottom="true"
                 android:layout_alignParentEnd="true"
                 android:layout_gravity="bottom|right"
+                android:layout_marginBottom="15dp"
+                android:layout_marginRight="15dp"
                 android:clickable="true"
+                android:paddingBottom="15dp"
+                android:paddingRight="15dp"
                 app:backgroundTint="@android:color/holo_red_light"
                 app:fabSize="normal"
                 app:srcCompat="@android:drawable/ic_media_pause" />
-
 
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/start_button"
@@ -33,7 +37,11 @@
                 android:layout_alignParentBottom="true"
                 android:layout_alignParentEnd="true"
                 android:layout_gravity="bottom|right"
+                android:layout_marginBottom="15dp"
+                android:layout_marginRight="15dp"
                 android:clickable="true"
+                android:paddingBottom="15dp"
+                android:paddingRight="15dp"
                 app:backgroundTint="@android:color/holo_green_light"
                 app:fabSize="normal"
                 app:srcCompat="@android:drawable/ic_media_play" />
@@ -59,6 +67,7 @@
 
                 <Button
                     android:id="@+id/enter_manually"
+                    style="@style/Widget.AppCompat.Button.Colored"
                     android:layout_width="168dp"
                     android:layout_height="wrap_content"
                     android:layout_alignBaseline="@+id/reset_time"
@@ -68,6 +77,7 @@
 
                 <Button
                     android:id="@+id/reset_time"
+                    style="@style/Widget.AppCompat.Button.Colored"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignParentTop="true"
@@ -77,6 +87,7 @@
 
                 <Button
                     android:id="@+id/save"
+                    style="@style/Widget.AppCompat.Button.Colored"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignBaseline="@+id/enter_manually"

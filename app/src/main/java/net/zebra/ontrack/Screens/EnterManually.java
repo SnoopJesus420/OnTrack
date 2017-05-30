@@ -7,10 +7,12 @@ import android.support.annotation.Nullable;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import net.zebra.ontrack.R;
+import net.zebra.ontrack.tools.RecordedTime;
 
 /**
  * Created by Zeb on 5/6/17.
@@ -19,6 +21,8 @@ import net.zebra.ontrack.R;
 public class EnterManually extends Activity {
     private TextView timeView, dateView, weatherView;
     private Button enterTime, enterDate, enterWeather;
+    public Button setButton;
+    public String hh,mm,ss,mn,dd,yy,ww;
 
     public void initViews(){
         timeView = (TextView)findViewById(R.id.time_text_view);
@@ -44,24 +48,33 @@ public class EnterManually extends Activity {
         enterTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final View popupView = getLayoutInflater().inflate(R.layout.time_date_popup, null);
+                setEnterTime(v);
+            }
+        });
+    }
+    public void setEnterTime(View v){
+        final View popupView = getLayoutInflater().inflate(R.layout.manual_time_popup, null);
 
-                final PopupWindow pw = new PopupWindow(popupView, ActionBar.LayoutParams.WRAP_CONTENT, ActionBar.LayoutParams.WRAP_CONTENT);
+        final PopupWindow pw = new PopupWindow(popupView, ActionBar.LayoutParams.WRAP_CONTENT, ActionBar.LayoutParams.WRAP_CONTENT);
 
+        pw.setAnimationStyle(R.style.Fade_Animation);
 
+        pw.setFocusable(true);
 
+        pw.showAtLocation(v, Gravity.CENTER, 0,0);
 
-                pw.setAnimationStyle(R.style.Fade_Animation);
+        final EditText hh = (EditText) popupView.findViewById(R.id.enter_hours);
+        final EditText mm = (EditText) popupView.findViewById(R.id.enter_minutes);
+        final EditText ss = (EditText) popupView.findViewById(R.id.enter_seconds);
 
-                pw.setFocusable(true);
-
-                pw.showAtLocation(v, Gravity.CENTER, 0,0);
+        setButton = (Button)popupView.findViewById(R.id.manual_time_set_button);
+        setButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String total = hh.getText().toString() + ":" + mm.getText().toString() + ":" + ss.getText().toString();
+                RecordedTime.addTime(total);
             }
         });
 
-
-
     }
-
-
 }

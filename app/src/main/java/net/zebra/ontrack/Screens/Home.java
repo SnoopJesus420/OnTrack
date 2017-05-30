@@ -9,6 +9,7 @@ import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,7 +31,7 @@ import java.util.concurrent.TimeUnit;
 public class Home extends Fragment {
 
     private TextView startTimeMessage;
-    public static boolean isRec;
+    public static boolean isRec, emptyChron;
     Chronometer chron;
     private Button resetTime, saveToLog, enterManually;
     private FloatingActionButton startBtn, stopBtn;
@@ -41,6 +42,7 @@ public class Home extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         final View v = inflater.inflate(R.layout.home,container, false);
         isRec = false;
+        emptyChron = true;
 
         startTimeMessage = (TextView)v.findViewById(R.id.time_clock);
 
@@ -69,40 +71,29 @@ public class Home extends Fragment {
                 chron.start();
 
                 startTimeMessage.setVisibility(View.INVISIBLE);
-                stopBtn.show();
+
                 startBtn.hide();
+                stopBtn.show();
+
             }
         });
 
         stopBtn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 isRec = false;
+                emptyChron = false;
                 startTimeMessage.setVisibility(View.VISIBLE);
-                chron.stop();
-
-
-                /*SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
-                SharedPreferences.Editor edit = sp.edit();
-
-                edit.putString("stoptime", stoppedTime);
-                edit.putString("hours", hours);
-                edit.putString("minutes", minutes);
-                edit.apply(); */
 
                 long elapsedMillis = SystemClock.elapsedRealtime() - chron.getBase();
-
-                //long hours = TimeUnit.MILLISECONDS.toHours(elapsedMillis);
-                //long minutes = TimeUnit.MILLISECONDS.toMinutes(elapsedMillis);
                 long seconds = TimeUnit.MILLISECONDS.toSeconds(elapsedMillis);
 
                 getTime = "0:0:" + String.valueOf(seconds);
-
-
                 chron.stop();
 
-                startBtn.show();
                 stopBtn.hide();
+                startBtn.show();
+
 
             }
         });
@@ -110,8 +101,8 @@ public class Home extends Fragment {
         resetTime.setText("Reset Time");
         resetTime.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                RecordedTime.resetTime(getActivity());
+            public void onClick(View view) {
+                reset(view);
             }
         });
 
@@ -119,7 +110,10 @@ public class Home extends Fragment {
         saveToLog.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                RecordedTime.setTime(getTime);
+                if (!emptyChron)
+                RecordedTime.addTime(getTime);
+                else
+                    Snackbar.make(v, "No time has been recorded!", Snackbar.LENGTH_SHORT).show();
             }
         });
 
@@ -142,21 +136,35 @@ public class Home extends Fragment {
     public void enterManually(){
 
         startActivity(new Intent(getActivity(), EnterManually.class));
-        /*final View popupView = getActivity().getLayoutInflater().inflate(R.layout.enter_manually, null);
+    }
+    public void reset(final View v){
+        final View popupView = getActivity().getLayoutInflater().inflate(R.layout.reset_time_confirmation, null);
 
         final PopupWindow pw = new PopupWindow(popupView, ActionBar.LayoutParams.WRAP_CONTENT, ActionBar.LayoutParams.WRAP_CONTENT);
+        Button yes = (Button)popupView.findViewById(R.id.reset_yes),
+                no = (Button)popupView.findViewById(R.id.reset_no);
 
-        TextView manualHeader = (TextView)popupView.findViewById(R.id.enter_manually_header);
-        TextView timeTv = (TextView)popupView.findViewById(R.id.time_text_view);
+        yes.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                RecordedTime.resetTime(getActivity());
+                pw.dismiss();
+                Snackbar.make(v, "Time has been reset!", Snackbar.LENGTH_SHORT).show();
+            }
+        });
 
-        manualHeader.setText("Enter Time Manually");
-        timeTv.setText("--:--:--");
-
-
+        no.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                pw.dismiss();
+            }
+        });
 
         pw.setAnimationStyle(R.style.Fade_Animation);
 
-        pw.showAtLocation(v, Gravity.CENTER, 0,0);*/
+        pw.setFocusable(true);
+
+        pw.showAtLocation(v, Gravity.CENTER, 0,0);
     }
     public static boolean areWeRec(){
         return isRec;
