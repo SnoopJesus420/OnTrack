@@ -31,7 +31,6 @@ public class Dashboard extends Fragment {
 
         currenttime = (TextView)v.findViewById(R.id.current_logged_time);
         String clt = "Current Logged Time: ";
-        progressBar = (ProgressBar) v.findViewById(R.id.progressBar);
         String t = clt + RecordedTime.getTotalTime() ;
         currenttime.setText(t);
 
@@ -39,10 +38,7 @@ public class Dashboard extends Fragment {
         recentRecord = (TextView)v.findViewById(R.id.most_recent_time);
         recentTime = RecordedTime.getTimeAtIndex(RecordedTime.getTimeArrayListLength()-1);
         recentDate.setText(recentTime.getDate());
-        recentRecord.setText(recentTime.getHours() + " H, " + recentTime.getMins() + " M, " + recentTime.getSecs() + " S");
-
-
-
+        recentRecord.setText(recentTime.getHours() + " h " + recentTime.getMins() + " m " + recentTime.getSecs() + " s");
 
         return v;
     }

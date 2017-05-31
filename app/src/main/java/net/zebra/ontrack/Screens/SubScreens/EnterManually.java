@@ -1,4 +1,4 @@
-package net.zebra.ontrack.Screens;
+package net.zebra.ontrack.Screens.SubScreens;
 
 import android.app.ActionBar;
 import android.app.Activity;

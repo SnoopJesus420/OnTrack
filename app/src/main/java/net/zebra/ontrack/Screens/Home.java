@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.view.Gravity;
@@ -20,6 +21,7 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import net.zebra.ontrack.R;
+import net.zebra.ontrack.Screens.SubScreens.EnterManually;
 import net.zebra.ontrack.tools.RecordedTime;
 
 import java.util.concurrent.TimeUnit;
@@ -45,6 +47,7 @@ public class Home extends Fragment {
         emptyChron = true;
 
         startTimeMessage = (TextView)v.findViewById(R.id.time_clock);
+        final CoordinatorLayout cl = (CoordinatorLayout)v.findViewById(R.id.home_coordinator);
 
         startBtn = (FloatingActionButton)v.findViewById(R.id.start_button);
         stopBtn = (FloatingActionButton)v.findViewById(R.id.stop_button);
@@ -103,7 +106,7 @@ public class Home extends Fragment {
         resetTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                reset(view);
+                reset(cl);
             }
         });
 
@@ -115,10 +118,10 @@ public class Home extends Fragment {
                     RecordedTime.addTime(getTime);
                     chron.setBase(SystemClock.elapsedRealtime());
                     moreThanOnce = true;
-                    Snackbar.make(v, "Saved!" , Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(cl, "Saved!" , Snackbar.LENGTH_SHORT).show();
                 }
                 else
-                    Snackbar.make(v, "No time has been recorded!", Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(cl, "No time has been recorded!", Snackbar.LENGTH_SHORT).show();
             }
         });
 
@@ -135,13 +138,11 @@ public class Home extends Fragment {
 
         return v;
     }
-
-
-
     public void enterManually(){
 
         startActivity(new Intent(getActivity(), EnterManually.class));
     }
+
     public void reset(final View v){
         final View popupView = getActivity().getLayoutInflater().inflate(R.layout.reset_time_confirmation, null);
 
@@ -171,6 +172,7 @@ public class Home extends Fragment {
 
         pw.showAtLocation(v, Gravity.CENTER, 0,0);
     }
+
     public static boolean areWeRec(){
         return isRec;
     }

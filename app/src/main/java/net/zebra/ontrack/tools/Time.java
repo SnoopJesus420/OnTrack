@@ -8,12 +8,6 @@ import java.util.Date;
 
 public class Time {
     //Precondition: date must be in the following format: mm/dd/yy
-    /*public Time(int h, int m, int s){
-        hours = h;
-        mins = m;
-        secs = s;
-        //date = d;
-    }*/
     public Time(int h, int m, int s, String d){
         hours = h;
         mins = m;
@@ -30,6 +24,9 @@ public class Time {
         return secs;
     }
     public String getDate(){return date;}
+    public String toString(){
+        return hours + " hours " + mins + " minutes " + secs + " seconds on " + date;
+    }
     public String getTotalTime(){
         return hours + ":" + mins + ":" + secs;
     }

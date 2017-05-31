@@ -15,6 +15,7 @@ import android.view.MenuItem;
 
 import net.zebra.ontrack.Screens.Dashboard;
 import net.zebra.ontrack.Screens.Home;
+import net.zebra.ontrack.Screens.Log;
 import net.zebra.ontrack.tools.RecordedTime;
 
 public class MainActivity extends AppCompatActivity {
@@ -28,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
-            CoordinatorLayout cl = (CoordinatorLayout)findViewById(R.id.coordinator);
+            CoordinatorLayout cl = (CoordinatorLayout)findViewById(R.id.home_coordinator);
 
             switch (item.getItemId()) {
                 case R.id.navigation_home:
@@ -59,7 +60,8 @@ public class MainActivity extends AppCompatActivity {
                         return false;
                     }
                     else {
-
+                        Fragment frag = new Log();
+                        replaceFragment(frag);
                     }
                     return true;
             }
@@ -93,44 +95,28 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        boolean previouslyStarted = prefs.getBoolean("previously_started", false);
-
-
-
-        tbl = prefs.getString("timeBeforeLeave", "00:00:00");
-        System.out.println(tbl);
-        if (!tbl.contains("null")){
-            RecordedTime.addTime(tbl);
-        }
-        else
-            RecordedTime.addTime("There was an error setting the time");
-
-
-
         SharedPreferences.Editor edit = prefs.edit();
 
-        if(!previouslyStarted) {
-            if (prefs.getString("timeBeforeLeave", "00:00:00").equals("00:00:00"))
-            edit.putBoolean("previously_started", Boolean.TRUE);
-            edit.putString("timeBeforeLeave", "00:00:00");
-            edit.apply();
-
+        tbl = prefs.getString("timeBeforeLeave", "00:00:00");
+        if (!tbl.contains("null")){
+            if (prefs.getString("timeBeforeLeave", "00:00:00").equals("00:00:00")) {
+                RecordedTime.addTime(tbl);
+                edit.putString("timeBeforeLeave", "00:00:00");
+                edit.apply();
+            }
         }
-    }
+        else
+            RecordedTime.addTime("00:00:00");
+        }
 
     @Override
     protected void onPause() {
         super.onPause();
 
-
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         SharedPreferences.Editor e = prefs.edit();
         e.putString("timeBeforeLeave", RecordedTime.getTotalTime());
         e.apply();
-
-
-
-
     }
     private void replaceFragment (Fragment fragment){
         String backStateName =  fragment.getClass().getName();

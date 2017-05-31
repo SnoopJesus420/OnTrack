@@ -18,7 +18,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Screens.EnterManually"
+        <activity android:name=".Screens.SubScreens.EnterManually"
             android:theme="@style/AppTheme"
             android:label="Enter Manually"/>
     </application>
