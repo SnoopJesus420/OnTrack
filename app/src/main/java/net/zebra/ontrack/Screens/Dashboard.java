@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import net.zebra.ontrack.R;
 import net.zebra.ontrack.tools.RecordedTime;
+import net.zebra.ontrack.tools.Time;
 
 /**
  * Created by Zeb on 4/20/17.
@@ -20,7 +21,8 @@ import net.zebra.ontrack.tools.RecordedTime;
 public class Dashboard extends Fragment {
     private TextView currenttime;
     private ProgressBar progressBar;
-    private Button notRegistered;
+    private TextView recentDate, recentRecord;
+    private Time recentTime;
 
     @Nullable
     @Override
@@ -29,11 +31,18 @@ public class Dashboard extends Fragment {
 
         currenttime = (TextView)v.findViewById(R.id.current_logged_time);
         String clt = "Current Logged Time: ";
-
         progressBar = (ProgressBar) v.findViewById(R.id.progressBar);
-
         String t = clt + RecordedTime.getTotalTime() ;
         currenttime.setText(t);
+
+        recentDate = (TextView)v.findViewById(R.id.most_recent_date);
+        recentRecord = (TextView)v.findViewById(R.id.most_recent_time);
+        recentTime = RecordedTime.getTimeAtIndex(RecordedTime.getTimeArrayListLength()-1);
+        recentDate.setText(recentTime.getDate());
+        recentRecord.setText(recentTime.getHours() + " H, " + recentTime.getMins() + " M, " + recentTime.getSecs() + " S");
+
+
+
 
         return v;
     }

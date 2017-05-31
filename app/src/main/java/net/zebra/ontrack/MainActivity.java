@@ -74,6 +74,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        SharedPreferences.Editor edit = prefs.edit();
+        edit.putBoolean("previously_started", Boolean.FALSE);
+        edit.apply();
 
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
@@ -89,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        boolean previouslyStarted = prefs.getBoolean("enter_manually", false);
+        boolean previouslyStarted = prefs.getBoolean("previously_started", false);
 
 
 
@@ -106,8 +110,7 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences.Editor edit = prefs.edit();
 
         if(!previouslyStarted) {
-            edit.putBoolean("enter_manually", Boolean.TRUE);
-            edit.apply();
+            edit.putBoolean("previously_started", Boolean.TRUE);
             edit.putString("timeBeforeLeave", "00:00:00");
             edit.apply();
 

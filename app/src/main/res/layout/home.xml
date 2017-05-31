@@ -42,7 +42,7 @@
                 android:clickable="true"
                 android:paddingBottom="15dp"
                 android:paddingRight="15dp"
-                app:backgroundTint="@android:color/holo_green_light"
+                app:backgroundTint="?android:attr/colorAccent"
                 app:fabSize="normal"
                 app:srcCompat="@android:drawable/ic_media_play" />
 
@@ -50,11 +50,10 @@
         </android.support.design.widget.CoordinatorLayout>
 
 
-
         <LinearLayout
             android:id="@+id/linearLayout"
             android:layout_width="match_parent"
-            android:layout_height="150dp"
+            android:layout_height="250dp"
             android:layout_alignParentStart="true"
             android:layout_marginBottom="121dp"
             android:orientation="vertical">
@@ -67,7 +66,7 @@
 
                 <Button
                     android:id="@+id/enter_manually"
-                    style="@style/Widget.AppCompat.Button.Colored"
+                    style="@style/Widget.AppCompat.Button.Borderless.Colored"
                     android:layout_width="168dp"
                     android:layout_height="wrap_content"
                     android:layout_alignBaseline="@+id/reset_time"
@@ -77,7 +76,7 @@
 
                 <Button
                     android:id="@+id/reset_time"
-                    style="@style/Widget.AppCompat.Button.Colored"
+                    style="@style/Widget.AppCompat.Button.Borderless.Colored"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignParentTop="true"
@@ -87,7 +86,7 @@
 
                 <Button
                     android:id="@+id/save"
-                    style="@style/Widget.AppCompat.Button.Colored"
+                    style="@style/Widget.AppCompat.Button.Borderless.Colored"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignBaseline="@+id/enter_manually"
@@ -100,23 +99,23 @@
             <TextView
                 android:id="@+id/time_clock"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
+                android:layout_height="100dp"
                 android:layout_alignBottom="@+id/chron"
                 android:layout_alignParentStart="true"
                 android:layout_weight="1"
                 android:gravity="center_vertical|center_horizontal"
                 android:text="TextView"
-                android:textSize="24sp" />
+                android:textSize="36sp" />
 
             <Chronometer
                 android:id="@+id/chron"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
+                android:layout_height="100dp"
                 android:layout_alignParentBottom="true"
                 android:layout_alignParentStart="true"
                 android:layout_weight="1"
                 android:gravity="center_vertical|center_horizontal"
-                android:textSize="24sp" />
+                android:textSize="64sp" />
         </LinearLayout>
 
     </RelativeLayout>

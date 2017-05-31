@@ -31,7 +31,7 @@ import java.util.concurrent.TimeUnit;
 public class Home extends Fragment {
 
     private TextView startTimeMessage;
-    public static boolean isRec, emptyChron;
+    public static boolean isRec, emptyChron, moreThanOnce;
     Chronometer chron;
     private Button resetTime, saveToLog, enterManually;
     private FloatingActionButton startBtn, stopBtn;
@@ -60,6 +60,7 @@ public class Home extends Fragment {
             @Override
             public void onClick(View v) {
                 isRec = true;
+                moreThanOnce = false;
 
                 SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
                 SharedPreferences.Editor edit = sp.edit();
@@ -110,8 +111,12 @@ public class Home extends Fragment {
         saveToLog.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!emptyChron)
-                RecordedTime.addTime(getTime);
+                if (!emptyChron && !moreThanOnce) {
+                    RecordedTime.addTime(getTime);
+                    chron.setBase(SystemClock.elapsedRealtime());
+                    moreThanOnce = true;
+                    Snackbar.make(v, "Saved!" , Snackbar.LENGTH_SHORT).show();
+                }
                 else
                     Snackbar.make(v, "No time has been recorded!", Snackbar.LENGTH_SHORT).show();
             }

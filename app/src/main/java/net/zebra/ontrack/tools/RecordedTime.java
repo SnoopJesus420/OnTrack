@@ -37,20 +37,16 @@ public class RecordedTime{
             seconds += newSeconds;
 
 
-                if (seconds >= 60) {
-                    do {
-                        seconds -= 60;
-                        minutes += 1;
-                    } while (seconds >= 60);
+            while (seconds >= 60){
+                seconds -= 60;
+                minutes += 1;
+            }
 
-                }
+            while (minutes >= 60){
+                minutes -= 60;
+                hours += 1;
+            }
 
-                if (minutes >= 60) {
-                    do{
-                        minutes -= 60;
-                        hours += 1;
-                    } while (minutes >= 60);
-                }
 
             if (seconds <= 9) {
                 fSeconds = String.format("%02d", seconds);
@@ -62,47 +58,36 @@ public class RecordedTime{
             }
             else fMinutes = Integer.toString(minutes);
 
-            fHours = Integer.toString(hours);
-            Time timeObj = new Time(hours, minutes, seconds);
+            if (minutes <= 9){
+                fHours = String.format("%02d", hours);
+            }
+            else fHours = Integer.toString(hours);
+
+
+            Time timeObj = new Time(newHours, newMinutes, newSeconds, df.format(day));
             addTimeToList(timeObj);
+
+
             time = fHours + ":" + fMinutes + ":" + fSeconds;
 
             isReset = false;
         }
         else {
-            time = t;
-            isReset = false;
-        }
-    }
+            DateFormat df = new SimpleDateFormat("MM/dd/yy");
+            Date day = new Date();
 
-    public static void addTimeWithDate(String t, Date day){
-        if (t.contains(":")) {
+            seconds = Integer.parseInt(t);
 
-            splitTime = t.split(":");
-
-            newHours = Integer.parseInt(splitTime[0]);
-            newMinutes = Integer.parseInt(splitTime[1]);
-            newSeconds = Integer.parseInt(splitTime[2]);
-
-            hours += newHours;
-            minutes += newMinutes;
-            seconds += newSeconds;
-
-
-            if (seconds >= 60) {
-                do {
-                    seconds -= 60;
-                    minutes += 1;
-                } while (seconds >= 60);
-
+            while (seconds >= 60){
+                seconds -= 60;
+                minutes += 1;
             }
 
-            if (minutes >= 60) {
-                do{
-                    minutes -= 60;
-                    hours += 1;
-                } while (minutes >= 60);
+            while (minutes >= 60){
+                minutes -= 60;
+                hours += 1;
             }
+
 
             if (seconds <= 9) {
                 fSeconds = String.format("%02d", seconds);
@@ -114,15 +99,17 @@ public class RecordedTime{
             }
             else fMinutes = Integer.toString(minutes);
 
-            fHours = Integer.toString(hours);
-            Time timeObj = new Time(hours, minutes, seconds);
+            if (minutes <= 9){
+                fHours = String.format("%02d", hours);
+            }
+            else fHours = Integer.toString(hours);
+
+            Time timeObj = new Time(newHours, newMinutes, newSeconds, df.format(day));
             addTimeToList(timeObj);
+
+
             time = fHours + ":" + fMinutes + ":" + fSeconds;
 
-            isReset = false;
-        }
-        else {
-            time = t;
             isReset = false;
         }
     }
@@ -137,6 +124,7 @@ public class RecordedTime{
         hours = 0;
         minutes = 0;
         seconds = 0;
+        timeArrayList.clear();
 
         isReset = true;
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(c);
@@ -146,7 +134,16 @@ public class RecordedTime{
     }
 
     public static Time getTimeAtIndex(int idx){
-        return timeArrayList.get(idx);
+        DateFormat df = new SimpleDateFormat("MM/dd/yy");
+        Date day = new Date();
+        Time ifFails = new Time(0,0,0,df.format(day));
+        if (timeArrayList.size() > 0)
+            return timeArrayList.get(idx);
+        else
+            return ifFails;
+    }
+    public static int getTimeArrayListLength(){
+        return timeArrayList.size();
     }
 
 
