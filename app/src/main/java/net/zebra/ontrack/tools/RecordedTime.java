@@ -64,8 +64,8 @@ public class RecordedTime{
             else fHours = Integer.toString(hours);
 
 
-            Time timeObj = new Time(newHours, newMinutes, newSeconds, df.format(day));
-            addTimeToList(timeObj);
+            Time mostRecentTime = new Time(newHours, newMinutes, newSeconds, df.format(day));
+            addTimeToList(mostRecentTime);
 
 
             time = fHours + ":" + fMinutes + ":" + fSeconds;
