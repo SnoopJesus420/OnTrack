@@ -110,6 +110,7 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences.Editor edit = prefs.edit();
 
         if(!previouslyStarted) {
+            if (prefs.getString("timeBeforeLeave", "00:00:00").equals("00:00:00"))
             edit.putBoolean("previously_started", Boolean.TRUE);
             edit.putString("timeBeforeLeave", "00:00:00");
             edit.apply();
