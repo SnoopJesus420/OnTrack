@@ -4,11 +4,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by Zeb on 4/23/17.
@@ -118,6 +125,34 @@ public class RecordedTime{
         timeArrayList.add(t);
     }
 
+    public static void storeTimeArrayList(Context c){
+        SharedPreferences prefs = PreferenceManager
+                .getDefaultSharedPreferences(c);
+        SharedPreferences.Editor e = prefs.edit();
+
+        Gson g = new Gson();
+        String timeInJson = g.toJson(timeArrayList);
+        Log.d("TAG", "timeInJson = " + timeInJson);
+        e.putString("stored_time_array_list", timeInJson);
+        e.apply();
+    }
+
+    public static void restoreTimeArrayList(Context c){
+        SharedPreferences prefs = PreferenceManager
+                .getDefaultSharedPreferences(c);
+        String timeInJson = prefs.getString("stored_time_array_list", "null");
+
+            Gson g = new Gson();
+
+            Type type = new TypeToken<ArrayList<Time>>() {
+            }.getType();
+            ArrayList<Time> restoredArrayList = g.fromJson(timeInJson, type);
+
+            for (int i = 0; i < restoredArrayList.size(); i++) {
+                timeArrayList.add(restoredArrayList.get(i));
+            }
+
+    }
 
     public static void resetTime(Context c){
         time = "00:00:00";
@@ -130,7 +165,7 @@ public class RecordedTime{
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(c);
         SharedPreferences.Editor e = prefs.edit();
         e.putString("timeBeforeLeave", time);
-        e.commit();
+        e.apply();
     }
 
     public static Time getTimeAtIndex(int idx){
@@ -142,6 +177,11 @@ public class RecordedTime{
         else
             return ifFails;
     }
+
+    public static ArrayList getTimeArray(){
+        return timeArrayList;
+    }
+
     public static int getTimeArrayListLength(){
         return timeArrayList.size();
     }

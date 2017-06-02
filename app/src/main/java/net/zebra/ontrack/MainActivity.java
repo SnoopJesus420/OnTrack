@@ -3,6 +3,7 @@ package net.zebra.ontrack;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.SharedPreferences;
+import android.icu.text.AlphabeticIndex;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -17,6 +18,7 @@ import net.zebra.ontrack.Screens.Dashboard;
 import net.zebra.ontrack.Screens.Home;
 import net.zebra.ontrack.Screens.Log;
 import net.zebra.ontrack.tools.RecordedTime;
+import net.zebra.ontrack.tools.Time;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -29,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
-            CoordinatorLayout cl = (CoordinatorLayout)findViewById(R.id.home_coordinator);
+            CoordinatorLayout cl = (CoordinatorLayout) findViewById(R.id.home_coordinator);
 
             switch (item.getItemId()) {
                 case R.id.navigation_home:
@@ -37,29 +39,26 @@ public class MainActivity extends AppCompatActivity {
                     if (Home.areWeRec()) {
                         Snackbar.make(cl, "You are recording!", Snackbar.LENGTH_SHORT).show();
                         return false;
-                    }
-                    else{
-                Fragment fragment = new Home();
-                replaceFragment(fragment);
+                    } else {
+                        Fragment fragment = new Home();
+                        replaceFragment(fragment);
                     }
                     return true;
                 case R.id.navigation_dashboard:
-                    if (Home.areWeRec()){
+                    if (Home.areWeRec()) {
                         Snackbar.make(cl, "You are recording!", Snackbar.LENGTH_SHORT).show();
                         return false;
-                    }
-                    else {
+                    } else {
 
                         Fragment frag = new Dashboard();
                         replaceFragment(frag);
                     }
                     return true;
                 case R.id.navigation_log:
-                    if (Home.areWeRec()){
+                    if (Home.areWeRec()) {
                         Snackbar.make(cl, "You are recording!", Snackbar.LENGTH_SHORT).show();
                         return false;
-                    }
-                    else {
+                    } else {
                         Fragment frag = new Log();
                         replaceFragment(frag);
                     }
@@ -76,6 +75,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Time t = new Time(0,0,0, "00/00/00");
+        RecordedTime.addTimeToList(t);
+
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         SharedPreferences.Editor edit = prefs.edit();
         edit.putBoolean("previously_started", Boolean.FALSE);
@@ -83,7 +85,6 @@ public class MainActivity extends AppCompatActivity {
 
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-
 
 
         Fragment fragment = new Home();
@@ -96,18 +97,31 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         SharedPreferences.Editor edit = prefs.edit();
+        boolean previouslyStarted = prefs.getBoolean("previously_started", false);
 
         tbl = prefs.getString("timeBeforeLeave", "00:00:00");
-        if (!tbl.contains("null")){
+        if (!tbl.contains("null")) {
             if (prefs.getString("timeBeforeLeave", "00:00:00").equals("00:00:00")) {
-                RecordedTime.addTime(tbl);
-                edit.putString("timeBeforeLeave", "00:00:00");
-                edit.apply();
+
+                //RecordedTime.addTime(tbl);
+                RecordedTime.restoreTimeArrayList(this);
+
             }
-        }
-        else
+        } else
             RecordedTime.addTime("00:00:00");
+
+        if (!previouslyStarted)
+
+        {
+            edit.putBoolean("previously_started", Boolean.TRUE);
+            //RecordedTime.addTime(tbl);
+            edit.apply();
+            RecordedTime.restoreTimeArrayList(this);
+
         }
+    }
+
+
 
     @Override
     protected void onPause() {
@@ -115,8 +129,10 @@ public class MainActivity extends AppCompatActivity {
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         SharedPreferences.Editor e = prefs.edit();
-        e.putString("timeBeforeLeave", RecordedTime.getTotalTime());
+        //e.putString("timeBeforeLeave", RecordedTime.getTotalTime());
         e.apply();
+
+        RecordedTime.storeTimeArrayList(this);
     }
     private void replaceFragment (Fragment fragment){
         String backStateName =  fragment.getClass().getName();

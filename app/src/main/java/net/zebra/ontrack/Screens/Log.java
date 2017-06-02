@@ -17,16 +17,12 @@ import java.util.ArrayList;
 
 public class Log extends Fragment{
     private ListView lv;
-    private final ArrayList<Time> timeArrayList = new ArrayList<Time>();
+    private final ArrayList<Time> timeArrayList = RecordedTime.getTimeArray();
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         final View v = inflater.inflate(R.layout.log, container, false);
-
-        for (int i = 0; i < RecordedTime.getTimeArrayListLength(); i++){
-            timeArrayList.add(RecordedTime.getTimeAtIndex(i));
-        }
 
         String[] listItems = new String[timeArrayList.size()];
         lv = (ListView)v.findViewById(R.id.log_list_view);
