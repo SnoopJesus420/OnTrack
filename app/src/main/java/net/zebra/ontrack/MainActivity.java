@@ -3,7 +3,6 @@ package net.zebra.ontrack;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.SharedPreferences;
-import android.icu.text.AlphabeticIndex;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -14,11 +13,17 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 import net.zebra.ontrack.Screens.Dashboard;
 import net.zebra.ontrack.Screens.Home;
 import net.zebra.ontrack.Screens.Log;
 import net.zebra.ontrack.tools.RecordedTime;
 import net.zebra.ontrack.tools.Time;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -75,12 +80,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Time t = new Time(0,0,0, "00/00/00");
-        RecordedTime.addTimeToList(t);
-
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         SharedPreferences.Editor edit = prefs.edit();
         edit.putBoolean("previously_started", Boolean.FALSE);
+        edit.putBoolean("previously_started_dash", Boolean.FALSE);
         edit.apply();
 
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
@@ -93,47 +96,45 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+
+        Gson g = new Gson();
+        String timeBeforeLeave = g.toJson(RecordedTime.getTimeArray());
+        System.out.println(timeBeforeLeave);
+
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        SharedPreferences.Editor e = prefs.edit();
+        e.putString("timeBeforeLeave", timeBeforeLeave);
+        e.apply();
+
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         SharedPreferences.Editor edit = prefs.edit();
         boolean previouslyStarted = prefs.getBoolean("previously_started", false);
-
-        tbl = prefs.getString("timeBeforeLeave", "00:00:00");
-        if (!tbl.contains("null")) {
-            if (prefs.getString("timeBeforeLeave", "00:00:00").equals("00:00:00")) {
-
-                //RecordedTime.addTime(tbl);
-                RecordedTime.restoreTimeArrayList(this);
-
+        Gson g = new Gson();
+        tbl = prefs.getString("timeBeforeLeave", "null");
+        if (!tbl.contains("null") && !tbl.contains("[]")) {
+            if (tbl.equals("00:00:00")) {
+                Type type = new TypeToken<ArrayList<Time>>(){}.getType();
+                ArrayList<Time> rt = g.fromJson(tbl, type);
+                RecordedTime.addEntireArray(rt);
             }
-        } else
-            RecordedTime.addTime("00:00:00");
-
-        if (!previouslyStarted)
-
-        {
-            edit.putBoolean("previously_started", Boolean.TRUE);
-            //RecordedTime.addTime(tbl);
-            edit.apply();
-            RecordedTime.restoreTimeArrayList(this);
-
+            if (!previouslyStarted) {
+                edit.putBoolean("previously_started", Boolean.TRUE);
+                Type type = new TypeToken<ArrayList<Time>>(){}.getType();
+                ArrayList<Time> rt = g.fromJson(tbl, type);
+                RecordedTime.addEntireArray(rt);
+                edit.apply();
+            }
         }
     }
 
-
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        SharedPreferences.Editor e = prefs.edit();
-        //e.putString("timeBeforeLeave", RecordedTime.getTotalTime());
-        e.apply();
-
-        RecordedTime.storeTimeArrayList(this);
-    }
     private void replaceFragment (Fragment fragment){
         String backStateName =  fragment.getClass().getName();
 

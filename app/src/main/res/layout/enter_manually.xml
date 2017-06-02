@@ -6,59 +6,73 @@
     android:elevation="0dp">
 
     <RelativeLayout
-        android:layout_width="400dp"
-        android:layout_height="match_parent"
-        android:layout_marginTop="50dp">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="230dp"
-            android:layout_alignParentStart="true"
-            android:orientation="vertical">
+        <TextView
+            android:id="@+id/header"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:text="TextView"
+            android:textSize="36sp" />
 
-            <TextView
-                android:id="@+id/time_text_view"
+        <RelativeLayout
+            android:layout_width="400dp"
+            android:layout_height="match_parent"
+            android:layout_marginTop="50dp">
+
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingLeft="10dp"
-                android:text="TextView"
-                android:textSize="24sp" />
+                android:layout_height="230dp"
+                android:layout_alignParentStart="true"
+                android:orientation="vertical"
+                android:id="@+id/linearLayout2">
+
+                <TextView
+                    android:id="@+id/time_text_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="10dp"
+                    android:text="TextView"
+                    android:textSize="24sp" />
+
+                <Button
+                    android:id="@+id/enter_time_manual"
+                    style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Button" />
+
+                <TextView
+                    android:id="@+id/date_text_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="10dp"
+                    android:text="TextView"
+                    android:textSize="24sp" />
+
+                <Button
+                    android:id="@+id/enter_date_manual"
+                    style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Button" />
+
+            </LinearLayout>
 
             <Button
-                android:id="@+id/enter_time_manual"
-                android:layout_width="match_parent"
+                android:id="@+id/enter_manually_save"
+                style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                android:layout_width="150dp"
                 android:layout_height="wrap_content"
-                android:text="Button" />
+                android:layout_marginBottom="34dp"
+                android:text="Button"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true" />
 
-            <TextView
-                android:id="@+id/date_text_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingLeft="10dp"
-                android:text="TextView"
-                android:textSize="24sp" />
-
-            <Button
-                android:id="@+id/enter_date_manual"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Button" />
-
-            <TextView
-                android:id="@+id/weather_text_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="TextView"
-                android:textSize="24sp" />
-
-            <Button
-                android:id="@+id/enter_weather_manual"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Button" />
-
-        </LinearLayout>
-
+        </RelativeLayout>
     </RelativeLayout>
 
-    </FrameLayout>
+</FrameLayout>

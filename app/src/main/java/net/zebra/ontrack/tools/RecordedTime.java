@@ -1,31 +1,19 @@
 package net.zebra.ontrack.tools;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import java.lang.reflect.Type;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Created by Zeb on 4/23/17.
  */
 
 public class RecordedTime{
-
-    public static String getTotalTime(){
-        return time;
-    }
 
     public static void addTime(String t){
         if (t.contains(":")) {
@@ -121,37 +109,56 @@ public class RecordedTime{
         }
     }
 
+    public static void addEntireArray(ArrayList<Time> t){
+        if (t.size() > 0) {
+            for (int i = 0; i < t.size(); i++) {
+                timeArrayList.add(t.get(i));
+            }
+        }
+    }
+
     public static void addTimeToList(Time t){
         timeArrayList.add(t);
     }
 
-    public static void storeTimeArrayList(Context c){
-        SharedPreferences prefs = PreferenceManager
-                .getDefaultSharedPreferences(c);
-        SharedPreferences.Editor e = prefs.edit();
-
-        Gson g = new Gson();
-        String timeInJson = g.toJson(timeArrayList);
-        Log.d("TAG", "timeInJson = " + timeInJson);
-        e.putString("stored_time_array_list", timeInJson);
-        e.apply();
+    public static Time getTimeAtIndex(int idx){
+        DateFormat df = new SimpleDateFormat("MM/dd/yy");
+        Date day = new Date();
+        Time ifFails = new Time(0,0,0,df.format(day));
+        if (timeArrayList.size() > 0)
+            return timeArrayList.get(idx);
+        else
+            return ifFails;
     }
 
-    public static void restoreTimeArrayList(Context c){
-        SharedPreferences prefs = PreferenceManager
-                .getDefaultSharedPreferences(c);
-        String timeInJson = prefs.getString("stored_time_array_list", "null");
+    public static ArrayList<Time> getTimeArray(){
+        return timeArrayList;
+    }
 
-            Gson g = new Gson();
+    public static int getTimeArrayListLength(){
+        return timeArrayList.size();
+    }
 
-            Type type = new TypeToken<ArrayList<Time>>() {
-            }.getType();
-            ArrayList<Time> restoredArrayList = g.fromJson(timeInJson, type);
+    public static String getTotTime(ArrayList<Time> t) {
+        for (int i = 0; i < t.size(); i++) {
+            hh += t.get(i).getHours();
+            mm += t.get(i).getMins();
+            ss += t.get(i).getSecs();
+        }
 
-            for (int i = 0; i < restoredArrayList.size(); i++) {
-                timeArrayList.add(restoredArrayList.get(i));
-            }
+        if (ss <= 9) {
+            fSeconds = String.format("%02d", ss);
+        } else fSeconds = Integer.toString(ss);
 
+        if (mm <= 9) {
+            fMinutes = String.format("%02d", mm);
+        } else fMinutes = Integer.toString(mm);
+
+        if (hh <= 9) {
+            fHours = String.format("%02d", hh);
+        } else fHours = Integer.toString(hh);
+
+        return fHours + ":" + fMinutes + ":" + fSeconds;
     }
 
     public static void resetTime(Context c){
@@ -168,31 +175,23 @@ public class RecordedTime{
         e.apply();
     }
 
-    public static Time getTimeAtIndex(int idx){
-        DateFormat df = new SimpleDateFormat("MM/dd/yy");
-        Date day = new Date();
-        Time ifFails = new Time(0,0,0,df.format(day));
-        if (timeArrayList.size() > 0)
-            return timeArrayList.get(idx);
-        else
-            return ifFails;
-    }
+    public static void saveToTimeVariable(){
+        for (int i = 0; i < timeArrayList.size(); i++){
+            hh += timeArrayList.get(i).getHours();
+            mm += timeArrayList.get(i).getMins();
+            ss += timeArrayList.get(i).getSecs();
+        }
 
-    public static ArrayList getTimeArray(){
-        return timeArrayList;
+        time = hh + ":" + mm + ":" + ss;
     }
-
-    public static int getTimeArrayListLength(){
-        return timeArrayList.size();
-    }
-
 
     public static boolean checkReset(){
         return isReset;
     }
 
-    public static String time, fSeconds, fMinutes, fHours;
+    public static String time, getTime, fSeconds, fMinutes, fHours;
     public static String splitTime[];
+    private static int hh,mm,ss;
     public static int newHours, newMinutes, newSeconds;
     public static int hours, minutes, seconds;
     public static boolean isReset;

@@ -4,6 +4,8 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -13,25 +15,33 @@ import android.widget.TextView;
 
 import net.zebra.ontrack.R;
 import net.zebra.ontrack.tools.RecordedTime;
+import net.zebra.ontrack.tools.Time;
 
 /**
  * Created by Zeb on 5/6/17.
  */
 
 public class EnterManually extends Activity {
-    private TextView timeView, dateView, weatherView;
+    private TextView timeView, dateView, weatherView, headerView;
     private Button enterTime, enterDate, enterWeather;
-    public Button setButton;
-    public String hh,mm,ss,mn,dd,yy,ww;
+    public Button setButton,saveButton;
+    public String hours, mins, secs;
+    public String totalTime, totalDate;
 
     public void initViews(){
+        headerView = (TextView)findViewById(R.id.header);
         timeView = (TextView)findViewById(R.id.time_text_view);
         dateView = (TextView)findViewById(R.id.date_text_view);
-        weatherView = (TextView)findViewById(R.id.weather_text_view);
 
         enterTime = (Button)findViewById(R.id.enter_time_manual);
         enterDate= (Button)findViewById(R.id.enter_date_manual);
-        enterWeather = (Button)findViewById(R.id.enter_weather_manual);
+        saveButton = (Button)findViewById(R.id.enter_manually_save);
+
+        enterTime.setText("Enter Time");
+        enterDate.setText("Enter Date");
+        saveButton.setText("Save");
+
+
     }
 
     @Override
@@ -41,14 +51,35 @@ public class EnterManually extends Activity {
 
         initViews();
 
-        timeView.setText("Time: ");
-        dateView.setText("Date: ");
-        weatherView.setText("Weather: ");
+        final CoordinatorLayout cl = (CoordinatorLayout) findViewById(R.id.home_coordinator);
+
+        headerView.setText("Enter Manually");
+        timeView.setText("Time: --/--/--");
+        dateView.setText("Date: --/--/--");
+
 
         enterTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 setEnterTime(v);
+            }
+        });
+        enterDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setEnterDate(v);
+            }
+        });
+
+        saveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!totalTime.isEmpty() && !totalDate.isEmpty()) {
+                    Time manual = new Time(Integer.parseInt(hours), Integer.parseInt(mins), Integer.parseInt(secs), totalDate);
+                    RecordedTime.addTimeToList(manual);
+
+                }
+                else Snackbar.make(cl, "Please enter some values", Snackbar.LENGTH_SHORT).show();
             }
         });
     }
@@ -71,10 +102,56 @@ public class EnterManually extends Activity {
         setButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String total = hh.getText().toString() + ":" + mm.getText().toString() + ":" + ss.getText().toString();
-                RecordedTime.addTime(total);
+
+                totalTime = hh.getText().toString() + ":" + mm.getText().toString() + ":" + ss.getText().toString();
+                hours = hh.getText().toString();
+                mins = mm.getText().toString();
+                secs = ss.getText().toString();
+
+                if (!hours.isEmpty() && !mins.isEmpty() && !secs.isEmpty()){
+                    String tot = "Time: " + totalTime;
+                    timeView.setText(tot);
+                    pw.dismiss();
+                }
+                else
+                    Snackbar.make(popupView, "Please enter a valid time", Snackbar.LENGTH_SHORT).show();
+
             }
         });
+
+    }
+
+    public void setEnterDate(View v){
+
+        final View popupView = getLayoutInflater().inflate(R.layout.manual_date_popup, null);
+
+        final PopupWindow pw = new PopupWindow(popupView, ActionBar.LayoutParams.WRAP_CONTENT, ActionBar.LayoutParams.WRAP_CONTENT);
+
+        pw.setAnimationStyle(R.style.Fade_Animation);
+
+        pw.setFocusable(true);
+
+        pw.showAtLocation(v, Gravity.CENTER, 0,0);
+
+        final EditText MM = (EditText)popupView.findViewById(R.id.enter_month);
+        final EditText dd = (EditText)popupView.findViewById(R.id.enter_day);
+        final EditText yy = (EditText)popupView.findViewById(R.id.enter_year);
+
+        setButton = (Button)popupView.findViewById(R.id.manual_date_set_button);
+        setButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                totalDate = MM.getText().toString() + "/" + dd.getText().toString() + "/" + yy.getText().toString();
+                if (!totalDate.equals("//")) {
+                    String tot = "Date: " + totalDate;
+                    dateView.setText(tot);
+                    pw.dismiss();
+                }
+                else
+                    Snackbar.make(popupView, "Please enter a valid date", Snackbar.LENGTH_SHORT).show();
+            }
+        });
+
 
     }
 }

@@ -1,13 +1,12 @@
 package net.zebra.ontrack.tools;
 
-import java.util.Date;
-
 /**
  * Created by Zeb on 5/30/2017.
  */
 
 public class Time {
     //Precondition: date must be in the following format: mm/dd/yy
+    //Precondition: hours, minutes, and seconds must be a number greater than 0
     public Time(int h, int m, int s, String d){
         hours = h;
         mins = m;

@@ -68,6 +68,7 @@ public class Home extends Fragment {
                 SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
                 SharedPreferences.Editor edit = sp.edit();
                 edit.putBoolean("isRecording", true);
+                edit.apply();
 
 
 
