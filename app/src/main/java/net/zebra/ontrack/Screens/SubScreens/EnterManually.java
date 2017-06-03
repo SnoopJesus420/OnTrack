@@ -23,8 +23,8 @@ import net.zebra.ontrack.tools.Time;
 
 public class EnterManually extends Activity {
     private TextView timeView, dateView, weatherView, headerView;
-    private Button enterTime, enterDate, enterWeather;
-    public Button setButton,saveButton;
+    private Button enterTime, enterDate;
+    public Button setButton,saveButton, cancelButton;
     public String hours, mins, secs;
     public String totalTime, totalDate;
 
@@ -36,10 +36,12 @@ public class EnterManually extends Activity {
         enterTime = (Button)findViewById(R.id.enter_time_manual);
         enterDate= (Button)findViewById(R.id.enter_date_manual);
         saveButton = (Button)findViewById(R.id.enter_manually_save);
+        cancelButton = (Button)findViewById(R.id.cancel_manually);
 
         enterTime.setText("Enter Time");
         enterDate.setText("Enter Date");
         saveButton.setText("Save");
+        cancelButton.setText("Cancel");
 
 
     }
@@ -51,11 +53,14 @@ public class EnterManually extends Activity {
 
         initViews();
 
-        final CoordinatorLayout cl = (CoordinatorLayout) findViewById(R.id.home_coordinator);
+        final CoordinatorLayout cl = (CoordinatorLayout) findViewById(R.id.manual_coordinator);
 
         headerView.setText("Enter Manually");
         timeView.setText("Time: --/--/--");
         dateView.setText("Date: --/--/--");
+
+        totalDate = "";
+        totalTime = "";
 
 
         enterTime.setOnClickListener(new View.OnClickListener() {
@@ -74,12 +79,25 @@ public class EnterManually extends Activity {
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!totalTime.isEmpty() && !totalDate.isEmpty()) {
+                if (!totalTime.equals("") && !totalDate.equals("")) {
                     Time manual = new Time(Integer.parseInt(hours), Integer.parseInt(mins), Integer.parseInt(secs), totalDate);
                     RecordedTime.addTimeToList(manual);
-
+                    finish();
+                }
+                else if (totalDate.equals("")){
+                    Snackbar.make(cl, "Please enter a Date", Snackbar.LENGTH_SHORT).show();
+                }
+                else if (totalTime.equals("")){
+                    Snackbar.make(cl, "Please enter a Time", Snackbar.LENGTH_SHORT).show();
                 }
                 else Snackbar.make(cl, "Please enter some values", Snackbar.LENGTH_SHORT).show();
+            }
+        });
+
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
             }
         });
     }

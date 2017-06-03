@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
             switch (item.getItemId()) {
                 case R.id.navigation_home:
 
-                    if (Home.areWeRec()) {
+                    if (Home.getRecordingStatus()) {
                         Snackbar.make(cl, "You are recording!", Snackbar.LENGTH_SHORT).show();
                         return false;
                     } else {
@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                     return true;
                 case R.id.navigation_dashboard:
-                    if (Home.areWeRec()) {
+                    if (Home.getRecordingStatus()) {
                         Snackbar.make(cl, "You are recording!", Snackbar.LENGTH_SHORT).show();
                         return false;
                     } else {
@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                     return true;
                 case R.id.navigation_log:
-                    if (Home.areWeRec()) {
+                    if (Home.getRecordingStatus()) {
                         Snackbar.make(cl, "You are recording!", Snackbar.LENGTH_SHORT).show();
                         return false;
                     } else {
@@ -118,7 +118,8 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences.Editor edit = prefs.edit();
         boolean previouslyStarted = prefs.getBoolean("previously_started", false);
         Gson g = new Gson();
-        tbl = prefs.getString("timeBeforeLeave", "null");
+        tbl = prefs.getString("timeBeforeLeave", "[]");
+        System.out.println(tbl);
         if (!tbl.contains("null") && !tbl.contains("[]")) {
             if (tbl.equals("00:00:00")) {
                 Type type = new TypeToken<ArrayList<Time>>(){}.getType();
@@ -128,9 +129,8 @@ public class MainActivity extends AppCompatActivity {
             if (!previouslyStarted) {
                 edit.putBoolean("previously_started", Boolean.TRUE);
                 Type type = new TypeToken<ArrayList<Time>>(){}.getType();
-                System.out.println(tbl);
-                //ArrayList<Time> rt = g.fromJson(tbl, type);
-                //RecordedTime.addEntireArray(rt);
+                ArrayList<Time> rt = g.fromJson(tbl, type);
+                RecordedTime.addEntireArray(rt);
                 edit.apply();
             }
         }

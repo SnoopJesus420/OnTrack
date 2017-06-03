@@ -3,6 +3,14 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <TextView
+        android:id="@+id/log_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="15dp"
+        android:text="TextView"
+        android:textSize="30sp" />
+
     <ListView
         android:id="@+id/log_list_view"
         android:layout_width="match_parent"

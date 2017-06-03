@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/popup_frame"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:elevation="0dp">
 
-    <RelativeLayout
+    <android.support.design.widget.CoordinatorLayout
+        android:id="@+id/manual_coordinator"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -15,20 +17,52 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
+            android:paddingLeft="8dp"
             android:text="TextView"
             android:textSize="36sp" />
 
         <RelativeLayout
-            android:layout_width="400dp"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="50dp">
 
+            <Button
+                android:id="@+id/cancel_manually"
+                style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentStart="true"
+                android:layout_marginBottom="20dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:text="Button" />
+
+            <Button
+                android:id="@+id/enter_manually_save"
+                style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginBottom="20dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:text="Button" />
+
             <LinearLayout
+                android:id="@+id/linearLayout2"
                 android:layout_width="match_parent"
                 android:layout_height="230dp"
-                android:layout_alignParentStart="true"
                 android:orientation="vertical"
-                android:id="@+id/linearLayout2">
+                android:layout_alignParentTop="true"
+                android:layout_alignParentStart="true">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp">
+
+                </RelativeLayout>
 
                 <TextView
                     android:id="@+id/time_text_view"
@@ -62,17 +96,8 @@
 
             </LinearLayout>
 
-            <Button
-                android:id="@+id/enter_manually_save"
-                style="@style/Widget.AppCompat.Button.Borderless.Colored"
-                android:layout_width="150dp"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="34dp"
-                android:text="Button"
-                android:layout_alignParentBottom="true"
-                android:layout_centerHorizontal="true" />
-
         </RelativeLayout>
-    </RelativeLayout>
+
+    </android.support.design.widget.CoordinatorLayout>
 
 </FrameLayout>

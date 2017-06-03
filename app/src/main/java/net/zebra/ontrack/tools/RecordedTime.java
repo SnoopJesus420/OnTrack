@@ -141,6 +141,10 @@ public class RecordedTime{
 
     public static String getTotTime() {
 
+        hh = 0;
+        mm = 0;
+        ss = 0;
+
         for (int i = 0; i < timeArrayList.size(); i++) {
             hh += timeArrayList.get(i).getHours();
             mm += timeArrayList.get(i).getMins();
@@ -176,21 +180,8 @@ public class RecordedTime{
         e.apply();
     }
 
-    public static void saveToTimeVariable(){
-        for (int i = 0; i < timeArrayList.size(); i++){
-            hh += timeArrayList.get(i).getHours();
-            mm += timeArrayList.get(i).getMins();
-            ss += timeArrayList.get(i).getSecs();
-        }
 
-        time = hh + ":" + mm + ":" + ss;
-    }
-
-    public static boolean checkReset(){
-        return isReset;
-    }
-
-    public static String time, getTime, fSeconds, fMinutes, fHours;
+    public static String time, fSeconds, fMinutes, fHours;
     public static String splitTime[];
     private static int hh,mm,ss;
     public static int newHours, newMinutes, newSeconds;

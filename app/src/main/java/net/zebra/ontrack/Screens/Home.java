@@ -174,7 +174,7 @@ public class Home extends Fragment {
         pw.showAtLocation(v, Gravity.CENTER, 0,0);
     }
 
-    public static boolean areWeRec(){
+    public static boolean getRecordingStatus(){
         return isRec;
     }
 }
