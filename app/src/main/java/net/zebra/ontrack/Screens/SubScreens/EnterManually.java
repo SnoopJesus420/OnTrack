@@ -131,6 +131,12 @@ public class EnterManually extends Activity {
                     timeView.setText(tot);
                     pw.dismiss();
                 }
+                else if (Integer.parseInt(mins) > 59){
+                    Snackbar.make(popupView, "Please enter a valid time", Snackbar.LENGTH_SHORT).show();
+                }
+                else if (Integer.parseInt(secs) > 59){
+                    Snackbar.make(popupView, "Please enter a valid time", Snackbar.LENGTH_SHORT).show();
+                }
                 else
                     Snackbar.make(popupView, "Please enter a valid time", Snackbar.LENGTH_SHORT).show();
 
