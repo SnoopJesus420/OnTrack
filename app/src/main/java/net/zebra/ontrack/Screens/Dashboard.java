@@ -42,21 +42,21 @@ public class Dashboard extends Fragment {
 
         currenttime = (TextView)v.findViewById(R.id.current_logged_time);
         String clt = "Current Logged Time: ";
-        String process = processTime(RecordedTime.getTimeArray());
 
         if (!prefs.getBoolean("previously_started_dash", Boolean.FALSE)){
-            t = clt + process;
-            edit.putBoolean("previously_started_dash", Boolean.TRUE);
-        }
-
-        recentDate = (TextView)v.findViewById(R.id.most_recent_date);
-        recentRecord = (TextView)v.findViewById(R.id.most_recent_time);
-
-        if (!t.contains("null")){
+            if (!t.contains("null")){
+            t = clt + processTime(RecordedTime.getTimeArray());
             currenttime.setText(t);
+            edit.putBoolean("previously_started_dash", Boolean.TRUE);
+            }
         }
         else
             currenttime.setText("No Time has been recorded!");
+
+        edit.apply();
+
+        recentDate = (TextView)v.findViewById(R.id.most_recent_date);
+        recentRecord = (TextView)v.findViewById(R.id.most_recent_time);
 
 
         if (RecordedTime.getTimeArrayListLength() > 0){
