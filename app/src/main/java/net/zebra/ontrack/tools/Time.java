@@ -12,6 +12,17 @@ public class Time {
         mins = m;
         secs = s;
         date = d;
+
+        while (secs > 59){
+            secs -= 60;
+            mins += 1;
+        }
+
+        while (mins > 59){
+            mins -= 60;
+            hours += 1;
+        }
+
     }
     public int getHours(){
         return hours;
