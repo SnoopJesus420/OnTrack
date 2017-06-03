@@ -139,11 +139,12 @@ public class RecordedTime{
         return timeArrayList.size();
     }
 
-    public static String getTotTime(ArrayList<Time> t) {
-        for (int i = 0; i < t.size(); i++) {
-            hh += t.get(i).getHours();
-            mm += t.get(i).getMins();
-            ss += t.get(i).getSecs();
+    public static String getTotTime() {
+
+        for (int i = 0; i < timeArrayList.size(); i++) {
+            hh += timeArrayList.get(i).getHours();
+            mm += timeArrayList.get(i).getMins();
+            ss += timeArrayList.get(i).getSecs();
         }
 
         if (ss <= 9) {

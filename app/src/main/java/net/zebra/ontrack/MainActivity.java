@@ -128,8 +128,9 @@ public class MainActivity extends AppCompatActivity {
             if (!previouslyStarted) {
                 edit.putBoolean("previously_started", Boolean.TRUE);
                 Type type = new TypeToken<ArrayList<Time>>(){}.getType();
-                ArrayList<Time> rt = g.fromJson(tbl, type);
-                RecordedTime.addEntireArray(rt);
+                System.out.println(tbl);
+                //ArrayList<Time> rt = g.fromJson(tbl, type);
+                //RecordedTime.addEntireArray(rt);
                 edit.apply();
             }
         }
