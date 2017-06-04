@@ -68,7 +68,7 @@
                 <Button
                     android:id="@+id/enter_manually"
                     style="@style/Widget.AppCompat.Button.Borderless.Colored"
-                    android:layout_width="168dp"
+                    android:layout_width="165dp"
                     android:layout_height="wrap_content"
                     android:layout_alignBaseline="@+id/reset_time"
                     android:layout_alignBottom="@+id/reset_time"

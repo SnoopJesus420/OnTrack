@@ -19,7 +19,7 @@ import com.google.gson.reflect.TypeToken;
 import net.zebra.ontrack.Screens.Dashboard;
 import net.zebra.ontrack.Screens.Home;
 import net.zebra.ontrack.Screens.Log;
-import net.zebra.ontrack.tools.RecordedTime;
+import net.zebra.ontrack.tools.TimeHandler;
 import net.zebra.ontrack.tools.Time;
 
 import java.lang.reflect.Type;
@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.navigation_home:
 
                     if (Home.getRecordingStatus()) {
-                        Snackbar.make(cl, "You are recording!", Snackbar.LENGTH_SHORT).show();
+                        Snackbar.make(cl, "You are timing!", Snackbar.LENGTH_SHORT).show();
                         return false;
                     } else {
                         Fragment fragment = new Home();
@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
                     return true;
                 case R.id.navigation_dashboard:
                     if (Home.getRecordingStatus()) {
-                        Snackbar.make(cl, "You are recording!", Snackbar.LENGTH_SHORT).show();
+                        Snackbar.make(cl, "You are timing!", Snackbar.LENGTH_SHORT).show();
                         return false;
                     } else {
 
@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
                     return true;
                 case R.id.navigation_log:
                     if (Home.getRecordingStatus()) {
-                        Snackbar.make(cl, "You are recording!", Snackbar.LENGTH_SHORT).show();
+                        Snackbar.make(cl, "You are timing!", Snackbar.LENGTH_SHORT).show();
                         return false;
                     } else {
                         Fragment frag = new Log();
@@ -89,7 +89,6 @@ public class MainActivity extends AppCompatActivity {
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
-
         Fragment fragment = new Home();
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.replace(R.id.content, fragment).addToBackStack(null).commit();
@@ -100,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
 
         Gson g = new Gson();
-        String timeBeforeLeave = g.toJson(RecordedTime.getTimeArray());
+        String timeBeforeLeave = g.toJson(TimeHandler.getTimeArray());
         System.out.println(timeBeforeLeave);
 
 
@@ -124,13 +123,13 @@ public class MainActivity extends AppCompatActivity {
             if (tbl.equals("00:00:00")) {
                 Type type = new TypeToken<ArrayList<Time>>(){}.getType();
                 ArrayList<Time> rt = g.fromJson(tbl, type);
-                RecordedTime.addEntireArray(rt);
+                TimeHandler.addEntireArray(rt);
             }
             if (!previouslyStarted) {
                 edit.putBoolean("previously_started", Boolean.TRUE);
                 Type type = new TypeToken<ArrayList<Time>>(){}.getType();
                 ArrayList<Time> rt = g.fromJson(tbl, type);
-                RecordedTime.addEntireArray(rt);
+                TimeHandler.addEntireArray(rt);
                 edit.apply();
             }
         }

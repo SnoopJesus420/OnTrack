@@ -2,10 +2,14 @@ package net.zebra.ontrack.Screens.SubScreens;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -14,19 +18,24 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import net.zebra.ontrack.R;
-import net.zebra.ontrack.tools.RecordedTime;
+import net.zebra.ontrack.tools.TimeHandler;
 import net.zebra.ontrack.tools.Time;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Created by Zeb on 5/6/17.
  */
 
 public class EnterManually extends Activity {
-    private TextView timeView, dateView, weatherView, headerView;
+    private TextView timeView, dateView, headerView;
     private Button enterTime, enterDate;
-    public Button setButton,saveButton, cancelButton;
+    public Button setButton, saveButton, cancelButton, todayButton;
     public String hours, mins, secs;
     public String totalTime, totalDate;
+    private int size = 2;
 
     public void initViews(){
         headerView = (TextView)findViewById(R.id.header);
@@ -51,11 +60,16 @@ public class EnterManually extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.enter_manually);
 
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        SharedPreferences.Editor e = prefs.edit();
+        e.putBoolean("previously_started", Boolean.TRUE);
+        e.apply();
+
         initViews();
 
         final CoordinatorLayout cl = (CoordinatorLayout) findViewById(R.id.manual_coordinator);
 
-        headerView.setText("Enter Manually");
+        headerView.setText("Add Manually");
         timeView.setText("Time: --/--/--");
         dateView.setText("Date: --/--/--");
 
@@ -79,10 +93,8 @@ public class EnterManually extends Activity {
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!totalTime.equals("") && !totalDate.equals("")) {
-                    Time manual = new Time(Integer.parseInt(hours), Integer.parseInt(mins), Integer.parseInt(secs), totalDate);
-                    RecordedTime.addTimeToList(manual);
-                    finish();
+                if (totalTime.equals("") && totalDate.equals("")) {
+                    Snackbar.make(cl, "Please enter some values", Snackbar.LENGTH_SHORT).show();
                 }
                 else if (totalDate.equals("")){
                     Snackbar.make(cl, "Please enter a Date", Snackbar.LENGTH_SHORT).show();
@@ -90,7 +102,12 @@ public class EnterManually extends Activity {
                 else if (totalTime.equals("")){
                     Snackbar.make(cl, "Please enter a Time", Snackbar.LENGTH_SHORT).show();
                 }
-                else Snackbar.make(cl, "Please enter some values", Snackbar.LENGTH_SHORT).show();
+                else {
+                    Time manual = new Time(Integer.parseInt(hours), Integer.parseInt(mins), Integer.parseInt(secs), totalDate);
+                    TimeHandler.addTimeToList(manual);
+                    finish();
+                }
+
             }
         });
 
@@ -101,20 +118,59 @@ public class EnterManually extends Activity {
             }
         });
     }
+
     public void setEnterTime(View v){
         final View popupView = getLayoutInflater().inflate(R.layout.manual_time_popup, null);
 
         final PopupWindow pw = new PopupWindow(popupView, ActionBar.LayoutParams.WRAP_CONTENT, ActionBar.LayoutParams.WRAP_CONTENT);
 
-        pw.setAnimationStyle(R.style.Fade_Animation);
-
         pw.setFocusable(true);
+
+        pw.setAnimationStyle(R.style.Fade_Animation);
 
         pw.showAtLocation(v, Gravity.CENTER, 0,0);
 
         final EditText hh = (EditText) popupView.findViewById(R.id.enter_hours);
         final EditText mm = (EditText) popupView.findViewById(R.id.enter_minutes);
         final EditText ss = (EditText) popupView.findViewById(R.id.enter_seconds);
+
+        hh.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if (hh.getText().toString().length()==size) {
+                    mm.requestFocus();
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+
+        mm.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if (mm.getText().toString().length()==size) {
+                    ss.requestFocus();
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
 
         setButton = (Button)popupView.findViewById(R.id.manual_time_set_button);
         setButton.setOnClickListener(new View.OnClickListener() {
@@ -137,6 +193,7 @@ public class EnterManually extends Activity {
             }
         });
 
+
     }
 
     public void setEnterDate(View v){
@@ -145,15 +202,56 @@ public class EnterManually extends Activity {
 
         final PopupWindow pw = new PopupWindow(popupView, ActionBar.LayoutParams.WRAP_CONTENT, ActionBar.LayoutParams.WRAP_CONTENT);
 
-        pw.setAnimationStyle(R.style.Fade_Animation);
-
         pw.setFocusable(true);
 
+        pw.setAnimationStyle(R.style.Fade_Animation);
+
         pw.showAtLocation(v, Gravity.CENTER, 0,0);
+
+        final DateFormat df = new SimpleDateFormat("MM/dd/yy");
+        final Date day = new Date();
 
         final EditText MM = (EditText)popupView.findViewById(R.id.enter_month);
         final EditText dd = (EditText)popupView.findViewById(R.id.enter_day);
         final EditText yy = (EditText)popupView.findViewById(R.id.enter_year);
+
+        MM.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if (MM.getText().toString().length()==size) {
+                    dd.requestFocus();
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+
+        dd.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if (dd.getText().toString().length()==size) {
+                    yy.requestFocus();
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
 
         setButton = (Button)popupView.findViewById(R.id.manual_date_set_button);
         setButton.setOnClickListener(new View.OnClickListener() {
@@ -169,6 +267,20 @@ public class EnterManually extends Activity {
                     Snackbar.make(popupView, "Please enter a valid date", Snackbar.LENGTH_SHORT).show();
             }
         });
+
+        todayButton = (Button)popupView.findViewById(R.id.manual_today_button);
+        todayButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                totalDate = df.format(day);
+                String tot = "Date: " + totalDate;
+                dateView.setText(tot);
+                pw.dismiss();
+            }
+        });
+
+
+
 
 
     }

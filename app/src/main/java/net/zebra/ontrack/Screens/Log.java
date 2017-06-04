@@ -11,7 +11,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import net.zebra.ontrack.R;
-import net.zebra.ontrack.tools.RecordedTime;
+import net.zebra.ontrack.tools.TimeHandler;
 import net.zebra.ontrack.tools.Time;
 
 import java.util.ArrayList;
@@ -21,7 +21,7 @@ public class Log extends Fragment{
     private ListView lv;
     private TextView tv;
     private String header, noTime;
-    private final ArrayList<Time> timeArrayList = RecordedTime.getTimeArray();
+    private final ArrayList<Time> timeArrayList = TimeHandler.getTimeArray();
 
 
     @Override
@@ -41,7 +41,7 @@ public class Log extends Fragment{
         }
         Collections.reverse(timeArrayList);
 
-        if (RecordedTime.getTimeArrayListLength() > 0) {
+        if (TimeHandler.getTimeArray() != null) {
             String[] listItems = new String[timeArrayList.size()];
             lv = (ListView) v.findViewById(R.id.log_list_view);
             if (timeArrayList.size() > 0) {

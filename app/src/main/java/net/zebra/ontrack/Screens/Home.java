@@ -22,7 +22,7 @@ import android.widget.TextView;
 
 import net.zebra.ontrack.R;
 import net.zebra.ontrack.Screens.SubScreens.EnterManually;
-import net.zebra.ontrack.tools.RecordedTime;
+import net.zebra.ontrack.tools.TimeHandler;
 
 import java.util.concurrent.TimeUnit;
 
@@ -103,7 +103,7 @@ public class Home extends Fragment {
             }
         });
 
-        resetTime.setText("Reset Time");
+        resetTime.setText("Reset");
         resetTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -116,7 +116,7 @@ public class Home extends Fragment {
             @Override
             public void onClick(View v) {
                 if (!emptyChron && !moreThanOnce) {
-                    RecordedTime.addTime(getTime);
+                    TimeHandler.addTime(getTime);
                     chron.setBase(SystemClock.elapsedRealtime());
                     moreThanOnce = true;
                     Snackbar.make(cl, "Saved!" , Snackbar.LENGTH_SHORT).show();
@@ -126,7 +126,7 @@ public class Home extends Fragment {
             }
         });
 
-        enterManually.setText("Enter Manually");
+        enterManually.setText("Add Manually");
         enterManually.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -154,7 +154,7 @@ public class Home extends Fragment {
         yes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                RecordedTime.resetTime(getActivity());
+                TimeHandler.resetTime(getActivity());
                 pw.dismiss();
                 Snackbar.make(v, "Time has been reset!", Snackbar.LENGTH_SHORT).show();
             }
