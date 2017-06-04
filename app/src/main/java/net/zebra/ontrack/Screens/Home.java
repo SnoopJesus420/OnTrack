@@ -17,7 +17,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Chronometer;
+import android.widget.CompoundButton;
 import android.widget.PopupWindow;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import net.zebra.ontrack.R;
@@ -33,11 +35,13 @@ import java.util.concurrent.TimeUnit;
 public class Home extends Fragment {
 
     private TextView startTimeMessage;
-    public static boolean isRec, emptyChron, moreThanOnce;
+    public static boolean isRec, emptyChron, moreThanOnce, autoSave;
     Chronometer chron;
     private Button resetTime, saveToLog, enterManually;
+    private Switch autoSaveSwitch;
     private FloatingActionButton startBtn, stopBtn;
     public static String getTime;
+    private long timeWhenStopped;
 
     @Nullable
     @Override
@@ -45,6 +49,7 @@ public class Home extends Fragment {
         final View v = inflater.inflate(R.layout.home,container, false);
         isRec = false;
         emptyChron = true;
+        timeWhenStopped = 0;
 
         startTimeMessage = (TextView)v.findViewById(R.id.time_clock);
         final CoordinatorLayout cl = (CoordinatorLayout)v.findViewById(R.id.home_coordinator);
@@ -56,8 +61,22 @@ public class Home extends Fragment {
         saveToLog = (Button)v.findViewById(R.id.save);
         enterManually = (Button)v.findViewById(R.id.enter_manually);
 
+        autoSaveSwitch = (Switch)v.findViewById(R.id.auto_save);
+
         chron = (Chronometer)v.findViewById(R.id.chron);
         startTimeMessage.setText("Tap start to begin recording");
+
+        autoSaveSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if (b){
+                    autoSave = true;
+                }
+                else {
+                    autoSave = false;
+                }
+            }
+        });
 
         startBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -70,9 +89,7 @@ public class Home extends Fragment {
                 edit.putBoolean("isRecording", true);
                 edit.apply();
 
-
-
-                chron.setBase(SystemClock.elapsedRealtime());
+                chron.setBase(SystemClock.elapsedRealtime() + timeWhenStopped);
                 chron.start();
 
                 startTimeMessage.setVisibility(View.INVISIBLE);
@@ -92,9 +109,15 @@ public class Home extends Fragment {
 
                 long elapsedMillis = SystemClock.elapsedRealtime() - chron.getBase();
                 long seconds = TimeUnit.MILLISECONDS.toSeconds(elapsedMillis);
+                timeWhenStopped = chron.getBase() - SystemClock.elapsedRealtime();
 
                 getTime = "0:0:" + String.valueOf(seconds);
-                chron.stop();
+                if (autoSave){
+                    chron.stop();
+                    save(cl);
+                }
+                else
+                    chron.stop();
 
                 stopBtn.hide();
                 startBtn.show();
@@ -115,14 +138,7 @@ public class Home extends Fragment {
         saveToLog.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!emptyChron && !moreThanOnce) {
-                    TimeHandler.addTime(getTime);
-                    chron.setBase(SystemClock.elapsedRealtime());
-                    moreThanOnce = true;
-                    Snackbar.make(cl, "Saved!" , Snackbar.LENGTH_SHORT).show();
-                }
-                else
-                    Snackbar.make(cl, "No time has been recorded!", Snackbar.LENGTH_SHORT).show();
+                save(cl);
             }
         });
 
@@ -142,6 +158,18 @@ public class Home extends Fragment {
     public void enterManually(){
 
         startActivity(new Intent(getActivity(), EnterManually.class));
+    }
+
+    public void save(final CoordinatorLayout cl){
+        if (!emptyChron && !moreThanOnce) {
+            TimeHandler.addTime(getTime);
+            chron.setBase(SystemClock.elapsedRealtime());
+            moreThanOnce = true;
+            Snackbar.make(cl, "Saved!" , Snackbar.LENGTH_SHORT).show();
+            timeWhenStopped = 0;
+        }
+        else
+            Snackbar.make(cl, "No time has been recorded!", Snackbar.LENGTH_SHORT).show();
     }
 
     public void reset(final View v){
