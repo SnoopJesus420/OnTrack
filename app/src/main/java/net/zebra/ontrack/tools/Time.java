@@ -24,6 +24,7 @@ public class Time {
         }
 
     }
+
     public Time(int s, String d){
         secs = s;
         date = d;
@@ -38,19 +39,25 @@ public class Time {
             hours += 1;
         }
     }
+
     public int getHours(){
         return hours;
     }
+
     public int getMins(){
         return mins;
     }
+
     public int getSecs(){
         return secs;
     }
+
     public String getDate(){return date;}
+
     public String toString(){
         return hours + " hours " + mins + " minutes " + secs + " seconds on " + date;
     }
+
     public String getTotalTime(){
         return hours + ":" + mins + ":" + secs;
     }

@@ -6,9 +6,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
-import android.app.FragmentTransaction;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
@@ -37,12 +35,9 @@ public class MainActivity extends AppCompatActivity {
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
-        FragmentManager fm = getFragmentManager();
-
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
-            CoordinatorLayout cl = (CoordinatorLayout) findViewById(R.id.home_coordinator);
 
             switch (item.getItemId()) {
                 case R.id.navigation_home:
@@ -156,6 +151,7 @@ public class MainActivity extends AppCompatActivity {
                 Type type = new TypeToken<ArrayList<Time>>(){}.getType();
                 ArrayList<Time> rt = g.fromJson(tbl, type);
                 TimeHandler.addEntireArray(rt);
+                edit.putBoolean("previously_started", Boolean.TRUE);
             }
             if (!previouslyStarted) {
                 edit.putBoolean("previously_started", Boolean.TRUE);
