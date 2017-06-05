@@ -121,6 +121,10 @@ public class TimeHandler {
         timeArrayList.add(t);
     }
 
+    public static void setIsUpdated(boolean b){
+        isUpdated = b;
+    }
+
     public static Time getTimeAtIndex(int idx){
         DateFormat df = new SimpleDateFormat("MM/dd/yy");
         Date day = new Date();
@@ -151,6 +155,16 @@ public class TimeHandler {
             ss += timeArrayList.get(i).getSecs();
         }
 
+        while (ss > 59){
+            ss -= 60;
+            mm += 1;
+        }
+
+        while (mm > 59){
+            mm -= 60;
+            hh += 1;
+        }
+
         if (ss <= 9) {
             fSeconds = String.format("%02d", ss);
         } else fSeconds = Integer.toString(ss);
@@ -164,6 +178,10 @@ public class TimeHandler {
         } else fHours = Integer.toString(hh);
 
         return fHours + ":" + fMinutes + ":" + fSeconds;
+    }
+
+    public static boolean getIsUpdated(){
+        return isUpdated;
     }
 
     public static void resetTime(Context c){
@@ -186,7 +204,7 @@ public class TimeHandler {
     private static int hh,mm,ss;
     public static int newHours, newMinutes, newSeconds;
     public static int hours, minutes, seconds;
-    public static boolean isReset;
+    public static boolean isReset, isUpdated;
     private static ArrayList<Time> timeArrayList = new ArrayList<Time>();
 
 }

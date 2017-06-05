@@ -1,6 +1,5 @@
 package net.zebra.ontrack;
 
-import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -9,7 +8,8 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.app.FragmentTransaction;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
@@ -19,19 +19,25 @@ import com.google.gson.reflect.TypeToken;
 import net.zebra.ontrack.Screens.Dashboard;
 import net.zebra.ontrack.Screens.Home;
 import net.zebra.ontrack.Screens.Log;
+import net.zebra.ontrack.tools.FragmentPageAdapter;
 import net.zebra.ontrack.tools.TimeHandler;
 import net.zebra.ontrack.tools.Time;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
     public String tbl;
+    private ViewPager viewPager;
+    private MenuItem prevMenuItem;
 
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
+
+        FragmentManager fm = getFragmentManager();
 
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -41,32 +47,14 @@ public class MainActivity extends AppCompatActivity {
             switch (item.getItemId()) {
                 case R.id.navigation_home:
 
-                    if (Home.getRecordingStatus()) {
-                        Snackbar.make(cl, "You are timing!", Snackbar.LENGTH_SHORT).show();
-                        return false;
-                    } else {
-                        Fragment fragment = new Home();
-                        replaceFragment(fragment);
-                    }
+                    viewPager.setCurrentItem(0);
                     return true;
                 case R.id.navigation_dashboard:
-                    if (Home.getRecordingStatus()) {
-                        Snackbar.make(cl, "You are timing!", Snackbar.LENGTH_SHORT).show();
-                        return false;
-                    } else {
+                    viewPager.setCurrentItem(1);
 
-                        Fragment frag = new Dashboard();
-                        replaceFragment(frag);
-                    }
                     return true;
                 case R.id.navigation_log:
-                    if (Home.getRecordingStatus()) {
-                        Snackbar.make(cl, "You are timing!", Snackbar.LENGTH_SHORT).show();
-                        return false;
-                    } else {
-                        Fragment frag = new Log();
-                        replaceFragment(frag);
-                    }
+                    viewPager.setCurrentItem(2);
                     return true;
             }
             return false;
@@ -83,15 +71,59 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         SharedPreferences.Editor edit = prefs.edit();
         edit.putBoolean("previously_started", Boolean.FALSE);
-        edit.putBoolean("previously_started_dash", Boolean.FALSE);
         edit.apply();
 
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        final BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
-        Fragment fragment = new Home();
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.replace(R.id.content, fragment).addToBackStack(null).commit();
+        final List<android.support.v4.app.Fragment> listFragments = new ArrayList<>();
+        listFragments.add(new Home());
+        listFragments.add(new Dashboard());
+        listFragments.add(new Log());
+
+        final FragmentPageAdapter fpa = new FragmentPageAdapter(
+                getSupportFragmentManager(), listFragments);
+
+        viewPager = (ViewPager)findViewById(R.id.view_pager);
+        if(viewPager != null){
+            viewPager.setAdapter(fpa);
+        }
+
+        viewPager.setOffscreenPageLimit(3);
+
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                if (position == 1){
+                    ((Dashboard)fpa.getItem(position)).update();
+                }
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                if (prevMenuItem != null) {
+                    prevMenuItem.setChecked(false);
+                }
+                else {
+                    navigation.getMenu().getItem(0).setChecked(false);
+                }
+                if (position == 1){
+                    ((Dashboard)fpa.getItem(position)).update();
+                }
+                if (position == 2){
+                    ((Log)fpa.getItem(position)).update();
+                }
+
+                navigation.getMenu().getItem(position).setChecked(true);
+
+                prevMenuItem = navigation.getMenu().getItem(position);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
     }
 
     @Override
@@ -132,21 +164,6 @@ public class MainActivity extends AppCompatActivity {
                 TimeHandler.addEntireArray(rt);
                 edit.apply();
             }
-        }
-    }
-
-    private void replaceFragment (Fragment fragment){
-        String backStateName =  fragment.getClass().getName();
-
-        FragmentManager manager = getFragmentManager();
-        boolean fragmentPopped = manager.popBackStackImmediate (backStateName, 0);
-
-        if (!fragmentPopped && manager.findFragmentByTag(backStateName) == null){ //fragment not in back stack, create it.
-            FragmentTransaction ft = manager.beginTransaction();
-            ft.replace(R.id.content, fragment, backStateName);
-            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-            ft.addToBackStack(backStateName);
-            ft.commit();
         }
     }
 }

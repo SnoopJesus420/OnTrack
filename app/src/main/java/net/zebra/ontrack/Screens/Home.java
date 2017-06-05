@@ -1,7 +1,7 @@
 package net.zebra.ontrack.Screens;
 
 import android.app.ActionBar;
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -24,9 +24,13 @@ import android.widget.TextView;
 
 import net.zebra.ontrack.R;
 import net.zebra.ontrack.Screens.SubScreens.EnterManually;
+import net.zebra.ontrack.tools.Time;
 import net.zebra.ontrack.tools.TimeHandler;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
+import static java.lang.Math.toIntExact;
 
 /**
  * Created by Zeb on 4/19/17.
@@ -40,40 +44,42 @@ public class Home extends Fragment {
     private Button resetTime, saveToLog, enterManually;
     private Switch autoSaveSwitch;
     private FloatingActionButton startBtn, stopBtn;
-    public static String getTime;
+    public static Time getTime;
     private long timeWhenStopped;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         final View v = inflater.inflate(R.layout.home,container, false);
+        final CoordinatorLayout cl = (CoordinatorLayout)v.findViewById(R.id.home_coordinator);
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        final SharedPreferences.Editor edit = prefs.edit();
+
+
         isRec = false;
         emptyChron = true;
         timeWhenStopped = 0;
+        autoSave = prefs.getBoolean("auto_save", Boolean.FALSE);
 
-        startTimeMessage = (TextView)v.findViewById(R.id.time_clock);
-        final CoordinatorLayout cl = (CoordinatorLayout)v.findViewById(R.id.home_coordinator);
+        initViews(v);
 
-        startBtn = (FloatingActionButton)v.findViewById(R.id.start_button);
-        stopBtn = (FloatingActionButton)v.findViewById(R.id.stop_button);
-
-        resetTime = (Button)v.findViewById(R.id.reset_time);
-        saveToLog = (Button)v.findViewById(R.id.save);
-        enterManually = (Button)v.findViewById(R.id.enter_manually);
-
-        autoSaveSwitch = (Switch)v.findViewById(R.id.auto_save);
-
-        chron = (Chronometer)v.findViewById(R.id.chron);
         startTimeMessage.setText("Tap start to begin recording");
+
+        autoSaveSwitch.setChecked(prefs.getBoolean("auto_save", Boolean.FALSE));
 
         autoSaveSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 if (b){
                     autoSave = true;
+                    edit.putBoolean("auto_save", autoSave);
+                    edit.apply();
                 }
                 else {
                     autoSave = false;
+                    edit.putBoolean("auto_save", autoSave);
+                    edit.apply();
                 }
             }
         });
@@ -111,7 +117,7 @@ public class Home extends Fragment {
                 long seconds = TimeUnit.MILLISECONDS.toSeconds(elapsedMillis);
                 timeWhenStopped = chron.getBase() - SystemClock.elapsedRealtime();
 
-                getTime = "0:0:" + String.valueOf(seconds);
+                getTime = new Time((int) seconds , new SimpleDateFormat("MM/dd/yy").format(new Date()));
                 if (autoSave){
                     chron.stop();
                     save(cl);
@@ -150,9 +156,6 @@ public class Home extends Fragment {
             }
         });
 
-
-
-
         return v;
     }
     public void enterManually(){
@@ -162,11 +165,12 @@ public class Home extends Fragment {
 
     public void save(final CoordinatorLayout cl){
         if (!emptyChron && !moreThanOnce) {
-            TimeHandler.addTime(getTime);
+            TimeHandler.addTimeToList(getTime);
             chron.setBase(SystemClock.elapsedRealtime());
             moreThanOnce = true;
             Snackbar.make(cl, "Saved!" , Snackbar.LENGTH_SHORT).show();
             timeWhenStopped = 0;
+            TimeHandler.setIsUpdated(true);
         }
         else
             Snackbar.make(cl, "No time has been recorded!", Snackbar.LENGTH_SHORT).show();
@@ -200,6 +204,21 @@ public class Home extends Fragment {
         pw.setFocusable(true);
 
         pw.showAtLocation(v, Gravity.CENTER, 0,0);
+    }
+
+    public void initViews(View v){
+        startTimeMessage = (TextView)v.findViewById(R.id.time_clock);
+
+        startBtn = (FloatingActionButton)v.findViewById(R.id.start_button);
+        stopBtn = (FloatingActionButton)v.findViewById(R.id.stop_button);
+
+        resetTime = (Button)v.findViewById(R.id.reset_time);
+        saveToLog = (Button)v.findViewById(R.id.save);
+        enterManually = (Button)v.findViewById(R.id.enter_manually);
+
+        autoSaveSwitch = (Switch)v.findViewById(R.id.auto_save);
+
+        chron = (Chronometer)v.findViewById(R.id.chron);
     }
 
     public static boolean getRecordingStatus(){

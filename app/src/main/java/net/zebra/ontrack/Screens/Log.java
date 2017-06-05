@@ -2,7 +2,7 @@ package net.zebra.ontrack.Screens;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,10 +28,13 @@ public class Log extends Fragment{
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         final View v = inflater.inflate(R.layout.log, container, false);
 
+        lv = (ListView) v.findViewById(R.id.log_list_view);
+        tv = (TextView)v.findViewById(R.id.log_header);
+
         header = "Logged Time";
         noTime = "No Logged Time Available :(";
 
-        tv = (TextView)v.findViewById(R.id.log_header);
+
         tv.setText(header);
 
         for (int i = 0; i < timeArrayList.size(); i++) {
@@ -41,7 +44,7 @@ public class Log extends Fragment{
         }
         Collections.reverse(timeArrayList);
 
-        if (TimeHandler.getTimeArray() != null) {
+        if (TimeHandler.getTimeArrayListLength() != 0) {
             String[] listItems = new String[timeArrayList.size()];
             lv = (ListView) v.findViewById(R.id.log_list_view);
             if (timeArrayList.size() > 0) {
@@ -62,5 +65,34 @@ public class Log extends Fragment{
         Collections.reverse(timeArrayList);
         return v;
 
+    }
+    public void update(){
+        tv.setText(header);
+
+        for (int i = 0; i < timeArrayList.size(); i++) {
+            if (timeArrayList.get(i).getDate().equals("00/00/00") || timeArrayList.get(i).getTotalTime().equals("0:0:0")) {
+                timeArrayList.remove(i);
+            }
+        }
+        Collections.reverse(timeArrayList);
+
+        if (TimeHandler.getTimeArrayListLength() != 0) {
+            String[] listItems = new String[timeArrayList.size()];
+            if (timeArrayList.size() > 0) {
+                if (timeArrayList.get(0) != null) {
+
+                    for (int i = 0; i < timeArrayList.size(); i++) {
+                        Time t = timeArrayList.get(i);
+                        listItems[i] = t.toString();
+
+                    }
+                    ArrayAdapter adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, listItems);
+                    lv.setAdapter(adapter);
+                }
+            }
+        }
+        else
+            tv.setText(noTime);
+        Collections.reverse(timeArrayList);
     }
 }
