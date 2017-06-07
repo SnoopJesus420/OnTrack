@@ -1,5 +1,6 @@
 package net.zebra.ontrack;
 
+import android.app.ActionBar;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -7,7 +8,12 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Gravity;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.CompoundButton;
+import android.widget.PopupWindow;
+import android.widget.Switch;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -18,6 +24,8 @@ import net.zebra.ontrack.Screens.Log;
 import net.zebra.ontrack.tools.FragmentPageAdapter;
 import net.zebra.ontrack.tools.TimeHandler;
 import net.zebra.ontrack.tools.Time;
+import net.zebra.ontrack.tools.User;
+import net.zebra.ontrack.tools.UserHandler;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -65,6 +73,12 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences.Editor edit = prefs.edit();
         edit.putBoolean("previously_started", Boolean.FALSE);
         edit.apply();
+
+        ArrayList<User> users = UserHandler.getUserList();
+        if (users.size() > 0)
+        UserHandler.setCurrentUser(users.get(0).getName());
+        else
+            createNewUser();
 
         final BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
@@ -159,5 +173,20 @@ public class MainActivity extends AppCompatActivity {
                 edit.apply();
             }
         }
+    }
+
+    public void createNewUser(View v){
+        final View popupView = getLayoutInflater().inflate(R.layout.settings_menu_layout, null);
+
+        final PopupWindow pw = new PopupWindow(popupView, ActionBar.LayoutParams.WRAP_CONTENT, ActionBar.LayoutParams.WRAP_CONTENT);
+
+        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        final SharedPreferences.Editor edit = prefs.edit();
+
+        pw.setAnimationStyle(R.style.Fade_Animation);
+
+        pw.setFocusable(true);
+
+        pw.showAtLocation(v, Gravity.CENTER, 0,0);
     }
 }
