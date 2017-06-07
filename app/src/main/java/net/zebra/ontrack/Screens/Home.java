@@ -15,10 +15,13 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.CompoundButton;
+import android.widget.ImageButton;
 import android.widget.PopupWindow;
+import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -26,8 +29,12 @@ import net.zebra.ontrack.R;
 import net.zebra.ontrack.Screens.SubScreens.EnterManually;
 import net.zebra.ontrack.tools.Time;
 import net.zebra.ontrack.tools.TimeHandler;
+import net.zebra.ontrack.tools.User;
+import net.zebra.ontrack.tools.UserHandler;
 
+import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
@@ -41,6 +48,7 @@ public class Home extends Fragment {
     public static boolean isRec, emptyChron, moreThanOnce, autoSave;
     Chronometer chron;
     private Button resetTime, saveToLog, enterManually;
+    private ImageButton settingsBtn;
     private Switch autoSaveSwitch;
     private FloatingActionButton startBtn, stopBtn;
     public static Time getTime;
@@ -51,6 +59,11 @@ public class Home extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         final View v = inflater.inflate(R.layout.home,container, false);
         final CoordinatorLayout cl = (CoordinatorLayout)v.findViewById(R.id.home_coordinator);
+        Spinner userSelect = (Spinner)v.findViewById(R.id.select_profile);
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, UserHandler.getUserNames());
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        userSelect.setAdapter(adapter);
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         final SharedPreferences.Editor edit = prefs.edit();
@@ -64,24 +77,6 @@ public class Home extends Fragment {
         initViews(v);
 
         startTimeMessage.setText("Tap start to begin recording");
-
-        autoSaveSwitch.setChecked(prefs.getBoolean("auto_save", Boolean.FALSE));
-
-        autoSaveSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                if (b){
-                    autoSave = true;
-                    edit.putBoolean("auto_save", autoSave);
-                    edit.apply();
-                }
-                else {
-                    autoSave = false;
-                    edit.putBoolean("auto_save", autoSave);
-                    edit.apply();
-                }
-            }
-        });
 
         startBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -128,6 +123,13 @@ public class Home extends Fragment {
                 startBtn.show();
 
 
+            }
+        });
+
+        settingsBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                settings(cl);
             }
         });
 
@@ -205,6 +207,41 @@ public class Home extends Fragment {
         pw.showAtLocation(v, Gravity.CENTER, 0,0);
     }
 
+    public void settings(final View v){
+        final View popupView = getActivity().getLayoutInflater().inflate(R.layout.settings_menu_layout, null);
+
+        final PopupWindow pw = new PopupWindow(popupView, ActionBar.LayoutParams.WRAP_CONTENT, ActionBar.LayoutParams.WRAP_CONTENT);
+
+        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        final SharedPreferences.Editor edit = prefs.edit();
+
+        autoSaveSwitch = (Switch)popupView.findViewById(R.id.settings_auto_save);
+
+        autoSaveSwitch.setChecked(prefs.getBoolean("auto_save", Boolean.FALSE));
+
+        autoSaveSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if (b){
+                    autoSave = true;
+                    edit.putBoolean("auto_save", autoSave);
+                    edit.apply();
+                }
+                else {
+                    autoSave = false;
+                    edit.putBoolean("auto_save", autoSave);
+                    edit.apply();
+                }
+            }
+        });
+
+        pw.setAnimationStyle(R.style.Fade_Animation);
+
+        pw.setFocusable(true);
+
+        pw.showAtLocation(v, Gravity.CENTER, 0,0);
+    }
+
     public void initViews(View v){
         startTimeMessage = (TextView)v.findViewById(R.id.time_clock);
 
@@ -214,8 +251,7 @@ public class Home extends Fragment {
         resetTime = (Button)v.findViewById(R.id.reset_time);
         saveToLog = (Button)v.findViewById(R.id.save);
         enterManually = (Button)v.findViewById(R.id.enter_manually);
-
-        autoSaveSwitch = (Switch)v.findViewById(R.id.auto_save);
+        settingsBtn = (ImageButton)v.findViewById(R.id.settings_button);
 
         chron = (Chronometer)v.findViewById(R.id.chron);
     }
