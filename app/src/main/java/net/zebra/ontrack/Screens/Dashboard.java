@@ -9,8 +9,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import net.zebra.ontrack.R;
-import net.zebra.ontrack.tools.TimeHandler;
 import net.zebra.ontrack.tools.Time;
+import net.zebra.ontrack.tools.UserManager;
 
 
 /**
@@ -18,39 +18,40 @@ import net.zebra.ontrack.tools.Time;
  */
 
 public class Dashboard extends Fragment {
-    private TextView currenttime;
+    private TextView currentTime, curTimeHeader;
     private TextView recentDate, recentRecord;
     private Time recentTime;
-    private String totTime;
+    private String totTime, currentTimeHeader;
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
 
         final View v = inflater.inflate(R.layout.dashboard,container, false);
 
-        totTime = TimeHandler.getTotTime();
-        currenttime = (TextView)v.findViewById(R.id.current_logged_time);
-        currenttime.setText(totTime);
-
+        currentTime = (TextView)v.findViewById(R.id.current_logged_time);
+        curTimeHeader = (TextView)v.findViewById(R.id.current_time_header);
         recentDate = (TextView)v.findViewById(R.id.most_recent_date);
         recentRecord = (TextView)v.findViewById(R.id.most_recent_time);
 
-        if (TimeHandler.getTimeArrayListLength() != 0){
-            recentTime = TimeHandler.getTimeAtIndex(TimeHandler.getTimeArrayListLength()-1);
-            recentDate.setText(recentTime.getDate());
-            recentRecord.setText(recentTime.getHours() + " h " + recentTime.getMins() + " m " + recentTime.getSecs() + " s");
-        }
-        else
-            recentRecord.setText("No recent records");
-            recentDate.setText("");
+        update();
 
         return v;
     }
     public void update(){
-        currenttime.setText(TimeHandler.getTotTime());
+        if (UserManager.getCurrentUser() != null) {
+            currentTimeHeader = "Total tracked time for " + UserManager.getCurrentUser().getName();
+            totTime = UserManager.getCurrentUser().getTotTime();
+        }
+        else {
+            totTime = "";
+            currentTimeHeader = "No User Selected";
+        }
 
-        if (TimeHandler.getTimeArrayListLength() != 0){
-            recentTime = TimeHandler.getTimeAtIndex(TimeHandler.getTimeArrayListLength()-1);
+        curTimeHeader.setText(currentTimeHeader);
+        currentTime.setText(totTime);
+
+        if (UserManager.getCurrentUser() != null && UserManager.getCurrentUser().getTimeArrayListLength() > 0){
+            recentTime = UserManager.getCurrentUser().getTimeAtIndex(UserManager.getCurrentUser().getTimeArrayListLength()-1);
             recentDate.setText(recentTime.getDate());
             recentRecord.setText(recentTime.getHours() + " h " + recentTime.getMins() + " m " + recentTime.getSecs() + " s");
         }

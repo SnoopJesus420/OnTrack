@@ -1,6 +1,7 @@
 package net.zebra.ontrack.Screens;
 
 import android.app.ActionBar;
+import android.os.Looper;
 import android.support.v4.app.Fragment;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -11,32 +12,36 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentManager;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.PopupWindow;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import net.zebra.ontrack.R;
 import net.zebra.ontrack.Screens.SubScreens.EnterManually;
 import net.zebra.ontrack.tools.Time;
-import net.zebra.ontrack.tools.TimeHandler;
+import net.zebra.ontrack.tools.TimeManager;
 import net.zebra.ontrack.tools.User;
-import net.zebra.ontrack.tools.UserHandler;
+import net.zebra.ontrack.tools.UserManager;
 
-import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Handler;
 
 /**
  * Created by Zeb on 4/19/17.
@@ -49,7 +54,9 @@ public class Home extends Fragment {
     Chronometer chron;
     private Button resetTime, saveToLog, enterManually;
     private ImageButton settingsBtn;
+    private Spinner userSelect;
     private Switch autoSaveSwitch;
+    private ArrayAdapter<String> adapter;
     private FloatingActionButton startBtn, stopBtn;
     public static Time getTime;
     private long timeWhenStopped;
@@ -59,14 +66,21 @@ public class Home extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         final View v = inflater.inflate(R.layout.home,container, false);
         final CoordinatorLayout cl = (CoordinatorLayout)v.findViewById(R.id.home_coordinator);
-        Spinner userSelect = (Spinner)v.findViewById(R.id.select_profile);
+        userSelect = (Spinner)v.findViewById(R.id.select_profile);
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, UserHandler.getUserNames());
+
+        adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, UserManager.getUserNames());
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         userSelect.setAdapter(adapter);
 
+
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         final SharedPreferences.Editor edit = prefs.edit();
+        edit.apply();
+
+        ArrayList<User> users = UserManager.getUserList();
+        if (users.size() == 0)
+            createNewUser(v);
 
 
         isRec = false;
@@ -126,6 +140,17 @@ public class Home extends Fragment {
             }
         });
 
+        userSelect.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                UserManager.setCurrentUser(adapterView.getItemAtPosition(i).toString());
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+            }
+        });
+
         settingsBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -133,11 +158,11 @@ public class Home extends Fragment {
             }
         });
 
-        resetTime.setText("Reset");
+        resetTime.setText("Manage Users");
         resetTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                reset(cl);
+                manageUsers(cl);
             }
         });
 
@@ -166,12 +191,11 @@ public class Home extends Fragment {
 
     public void save(final CoordinatorLayout cl){
         if (!emptyChron && !moreThanOnce) {
-            TimeHandler.addTimeToList(getTime);
+            UserManager.getCurrentUser().addTimeToList(getTime);
             chron.setBase(SystemClock.elapsedRealtime());
             moreThanOnce = true;
             Snackbar.make(cl, "Saved!" , Snackbar.LENGTH_SHORT).show();
             timeWhenStopped = 0;
-            TimeHandler.setIsUpdated(true);
         }
         else
             Snackbar.make(cl, "No time has been recorded!", Snackbar.LENGTH_SHORT).show();
@@ -187,7 +211,7 @@ public class Home extends Fragment {
         yes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                TimeHandler.resetTime(getActivity());
+                TimeManager.resetTime(getActivity());
                 pw.dismiss();
                 Snackbar.make(v, "Time has been reset!", Snackbar.LENGTH_SHORT).show();
             }
@@ -216,6 +240,8 @@ public class Home extends Fragment {
         final SharedPreferences.Editor edit = prefs.edit();
 
         autoSaveSwitch = (Switch)popupView.findViewById(R.id.settings_auto_save);
+        resetTime = (Button)popupView.findViewById(R.id.settings_reset_button);
+
 
         autoSaveSwitch.setChecked(prefs.getBoolean("auto_save", Boolean.FALSE));
 
@@ -235,11 +261,26 @@ public class Home extends Fragment {
             }
         });
 
+        resetTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                reset(v);
+            }
+        });
+
         pw.setAnimationStyle(R.style.Fade_Animation);
 
         pw.setFocusable(true);
 
         pw.showAtLocation(v, Gravity.CENTER, 0,0);
+    }
+
+    public void update(){
+
+        adapter.clear();
+        adapter.addAll(UserManager.getUserNames());
+        adapter.notifyDataSetChanged();
+        userSelect.setAdapter(adapter);
     }
 
     public void initViews(View v){
@@ -248,7 +289,7 @@ public class Home extends Fragment {
         startBtn = (FloatingActionButton)v.findViewById(R.id.start_button);
         stopBtn = (FloatingActionButton)v.findViewById(R.id.stop_button);
 
-        resetTime = (Button)v.findViewById(R.id.reset_time);
+        resetTime = (Button)v.findViewById(R.id.manage_users);
         saveToLog = (Button)v.findViewById(R.id.save);
         enterManually = (Button)v.findViewById(R.id.enter_manually);
         settingsBtn = (ImageButton)v.findViewById(R.id.settings_button);
@@ -258,5 +299,96 @@ public class Home extends Fragment {
 
     public static boolean getRecordingStatus(){
         return isRec;
+    }
+
+    public void createNewUser(final View v){
+        final View popupView = getActivity().getLayoutInflater().inflate(R.layout.create_user_layout, null);
+
+        final PopupWindow pw = new PopupWindow(popupView, ActionBar.LayoutParams.WRAP_CONTENT, ActionBar.LayoutParams.WRAP_CONTENT);
+
+        final EditText userName = (EditText)popupView.findViewById(R.id.create_user_name);
+
+        final Button createUser = (Button)popupView.findViewById(R.id.create_user_button);
+        createUser.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String u = UserManager.createUser(userName.getText().toString());
+
+
+                Toast.makeText(getActivity(), u, Toast.LENGTH_SHORT).show();
+                if (u.equals("Created!")) {
+                    UserManager.setCurrentUser(userName.getText().toString());
+                    update();
+                    pw.dismiss();
+                    pw.dismiss();
+                }
+            }
+        });
+
+        pw.setAnimationStyle(R.style.Fade_Animation);
+
+        pw.setFocusable(true);
+
+        pw.showAtLocation(v, Gravity.CENTER, 0,0);
+    }
+
+    public void manageUsers(final View v){
+        final View popupView = getActivity().getLayoutInflater().inflate(R.layout.manage_user_layout, null);
+
+        final PopupWindow pw = new PopupWindow(popupView, ActionBar.LayoutParams.WRAP_CONTENT, ActionBar.LayoutParams.WRAP_CONTENT);
+
+        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        final SharedPreferences.Editor edit = prefs.edit();
+
+        Spinner userManage = (Spinner)popupView.findViewById(R.id.manage_user_spinner);
+        Button removeSelectedUser = (Button)popupView.findViewById(R.id.remove_user_button);
+        Button createNewUser = (Button)popupView.findViewById(R.id.create_user_button);
+
+        adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, UserManager.getUserNames());
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        userManage.setAdapter(adapter);
+
+        userManage.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                UserManager.setCurrentUser(adapterView.getItemAtPosition(i).toString());
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        removeSelectedUser.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                UserManager.deleteCurrentUser();
+                Toast.makeText(getActivity(), "Deleted", Toast.LENGTH_SHORT).show();
+                adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, UserManager.getUserNames());
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                userSelect.setAdapter(adapter);
+                if (UserManager.getUserList().size() > 0)
+                UserManager.setCurrentUser(UserManager.getUserList().get(0).getName());
+                else createNewUser(v);
+
+            }
+        });
+
+        createNewUser.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                createNewUser(v);
+            }
+        });
+
+
+
+        pw.setAnimationStyle(R.style.Fade_Animation);
+
+        pw.setFocusable(true);
+
+        pw.showAtLocation(v, Gravity.CENTER, 0,0);
+
     }
 }

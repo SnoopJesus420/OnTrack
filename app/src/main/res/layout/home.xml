@@ -35,7 +35,7 @@
                 android:layout_gravity="bottom|center"
                 android:layout_marginBottom="60dp"
                 android:layout_marginRight="68dp"
-                android:text="Profile:"
+                android:text="User:"
                 android:textSize="18sp" />
 
             <Spinner
@@ -111,13 +111,13 @@
                     style="@style/Widget.AppCompat.Button.Borderless.Colored"
                     android:layout_width="165dp"
                     android:layout_height="wrap_content"
-                    android:layout_alignBaseline="@+id/reset_time"
-                    android:layout_alignBottom="@+id/reset_time"
+                    android:layout_alignBaseline="@+id/manage_users"
+                    android:layout_alignBottom="@+id/manage_users"
                     android:layout_centerHorizontal="true"
                     android:text="Button" />
 
                 <Button
-                    android:id="@+id/reset_time"
+                    android:id="@+id/manage_users"
                     style="@style/Widget.AppCompat.Button.Borderless.Colored"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

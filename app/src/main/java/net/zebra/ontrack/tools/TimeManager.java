@@ -13,7 +13,7 @@ import java.util.Date;
  * Created by Zeb on 4/23/17.
  */
 
-public class TimeHandler {
+public class TimeManager {
 
     public static void addTime(String t){
         if (t.contains(":")) {

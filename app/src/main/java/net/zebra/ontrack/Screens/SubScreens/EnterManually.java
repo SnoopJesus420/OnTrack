@@ -18,7 +18,7 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import net.zebra.ontrack.R;
-import net.zebra.ontrack.tools.TimeHandler;
+import net.zebra.ontrack.tools.TimeManager;
 import net.zebra.ontrack.tools.Time;
 
 import java.text.DateFormat;
@@ -104,7 +104,7 @@ public class EnterManually extends Activity {
                 }
                 else {
                     Time manual = new Time(Integer.parseInt(hours), Integer.parseInt(mins), Integer.parseInt(secs), totalDate);
-                    TimeHandler.addTimeToList(manual);
+                    TimeManager.addTimeToList(manual);
                     finish();
                 }
 

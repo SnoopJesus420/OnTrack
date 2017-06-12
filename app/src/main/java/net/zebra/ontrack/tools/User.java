@@ -50,7 +50,10 @@ public class User {
     }
 
     public ArrayList<Time> getTimeArray(){
-        return timeArrayList;
+        if (timeArrayList.size() > 0)
+            return timeArrayList;
+        else
+            return null;
     }
 
     public int getTimeArrayListLength(){

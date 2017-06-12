@@ -11,8 +11,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import net.zebra.ontrack.R;
-import net.zebra.ontrack.tools.TimeHandler;
+import net.zebra.ontrack.tools.TimeManager;
 import net.zebra.ontrack.tools.Time;
+import net.zebra.ontrack.tools.UserManager;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,8 +21,9 @@ import java.util.Collections;
 public class Log extends Fragment{
     private ListView lv;
     private TextView tv;
-    private String header, noTime;
-    private final ArrayList<Time> timeArrayList = TimeHandler.getTimeArray();
+    private String header;
+    private boolean needsReversed;
+    private ArrayList<Time> timeArrayList;
 
 
     @Override
@@ -31,52 +33,34 @@ public class Log extends Fragment{
         lv = (ListView) v.findViewById(R.id.log_list_view);
         tv = (TextView)v.findViewById(R.id.log_header);
 
-        header = "Logged Time";
-        noTime = "No Logged Time Available :(";
+        update();
 
-
-        tv.setText(header);
-
-        for (int i = 0; i < timeArrayList.size(); i++) {
-            if (timeArrayList.get(i).getDate().equals("00/00/00") || timeArrayList.get(i).getTotalTime().equals("0:0:0")) {
-                timeArrayList.remove(i);
-            }
-        }
-        Collections.reverse(timeArrayList);
-
-        if (TimeHandler.getTimeArrayListLength() != 0) {
-            String[] listItems = new String[timeArrayList.size()];
-            lv = (ListView) v.findViewById(R.id.log_list_view);
-            if (timeArrayList.size() > 0) {
-                if (timeArrayList.get(0) != null) {
-
-                    for (int i = 0; i < timeArrayList.size(); i++) {
-                        Time t = timeArrayList.get(i);
-                        listItems[i] = t.toString();
-
-                    }
-                    ArrayAdapter adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, listItems);
-                    lv.setAdapter(adapter);
-                }
-            }
-        }
-        else
-            tv.setText(noTime);
-        Collections.reverse(timeArrayList);
         return v;
 
     }
     public void update(){
-        tv.setText(header);
 
-        for (int i = 0; i < timeArrayList.size(); i++) {
-            if (timeArrayList.get(i).getDate().equals("00/00/00") || timeArrayList.get(i).getTotalTime().equals("0:0:0")) {
-                timeArrayList.remove(i);
+        if (UserManager.getCurrentUser() != null) {
+            timeArrayList = UserManager.getCurrentUser().getTimeArray();
+            if (timeArrayList != null) {
+                Collections.reverse(timeArrayList);
+                needsReversed = true;
             }
+            else needsReversed = false;
         }
-        Collections.reverse(timeArrayList);
 
-        if (TimeHandler.getTimeArrayListLength() != 0) {
+
+        if (UserManager.getUserList().size() > 0 && timeArrayList != null) {
+
+            header = "Logged time for " + UserManager.getCurrentUser().getName();
+            tv.setText(header);
+
+            for (int i = 0; i < timeArrayList.size(); i++) {
+                if (timeArrayList.get(i).getDate().equals("00/00/00") || timeArrayList.get(i).getTotalTime().equals("0:0:0")) {
+                    timeArrayList.remove(i);
+                }
+            }
+
             String[] listItems = new String[timeArrayList.size()];
             if (timeArrayList.size() > 0) {
                 if (timeArrayList.get(0) != null) {
@@ -87,12 +71,16 @@ public class Log extends Fragment{
 
                     }
                     ArrayAdapter adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, listItems);
+                    adapter.notifyDataSetChanged();
                     lv.setAdapter(adapter);
                 }
             }
         }
-        else
-            tv.setText(noTime);
-        Collections.reverse(timeArrayList);
+        else {
+            header = "No time tracked for this user";
+            tv.setText(header);
+        }
+        if (needsReversed)
+            Collections.reverse(timeArrayList);
     }
 }

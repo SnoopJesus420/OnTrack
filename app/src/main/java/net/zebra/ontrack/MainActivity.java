@@ -1,19 +1,15 @@
 package net.zebra.ontrack;
 
-import android.app.ActionBar;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.UserHandle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.view.Gravity;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.CompoundButton;
-import android.widget.PopupWindow;
-import android.widget.Switch;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -22,14 +18,16 @@ import net.zebra.ontrack.Screens.Dashboard;
 import net.zebra.ontrack.Screens.Home;
 import net.zebra.ontrack.Screens.Log;
 import net.zebra.ontrack.tools.FragmentPageAdapter;
-import net.zebra.ontrack.tools.TimeHandler;
+import net.zebra.ontrack.tools.TimeManager;
 import net.zebra.ontrack.tools.Time;
 import net.zebra.ontrack.tools.User;
-import net.zebra.ontrack.tools.UserHandler;
+import net.zebra.ontrack.tools.UserManager;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -44,10 +42,8 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
-
             switch (item.getItemId()) {
                 case R.id.navigation_home:
-
                     viewPager.setCurrentItem(0);
                     return true;
                 case R.id.navigation_dashboard:
@@ -74,12 +70,6 @@ public class MainActivity extends AppCompatActivity {
         edit.putBoolean("previously_started", Boolean.FALSE);
         edit.apply();
 
-        ArrayList<User> users = UserHandler.getUserList();
-        if (users.size() > 0)
-        UserHandler.setCurrentUser(users.get(0).getName());
-        else
-            createNewUser();
-
         final BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
@@ -101,9 +91,7 @@ public class MainActivity extends AppCompatActivity {
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                if (position == 1){
-                    ((Dashboard)fpa.getItem(position)).update();
-                }
+
             }
 
             @Override
@@ -113,6 +101,9 @@ public class MainActivity extends AppCompatActivity {
                 }
                 else {
                     navigation.getMenu().getItem(0).setChecked(false);
+                }
+                if (position == 0){
+                    ((Home)fpa.getItem(position)).update();
                 }
                 if (position == 1){
                     ((Dashboard)fpa.getItem(position)).update();
@@ -138,13 +129,13 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
 
         Gson g = new Gson();
-        String timeBeforeLeave = g.toJson(TimeHandler.getTimeArray());
-        System.out.println(timeBeforeLeave);
+        String userListBeforeLeave = g.toJson(UserManager.getUserMap());
+        System.out.println(userListBeforeLeave);
 
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         SharedPreferences.Editor e = prefs.edit();
-        e.putString("timeBeforeLeave", timeBeforeLeave);
+        e.putString("timeBeforeLeave", userListBeforeLeave);
         e.apply();
 
     }
@@ -156,37 +147,23 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences.Editor edit = prefs.edit();
         boolean previouslyStarted = prefs.getBoolean("previously_started", false);
         Gson g = new Gson();
-        tbl = prefs.getString("timeBeforeLeave", "[]");
+        tbl = prefs.getString("timeBeforeLeave", "{}");
         System.out.println(tbl);
-        if (!tbl.contains("null") && !tbl.contains("[]")) {
-            if (tbl.equals("00:00:00")) {
-                Type type = new TypeToken<ArrayList<Time>>(){}.getType();
-                ArrayList<Time> rt = g.fromJson(tbl, type);
-                TimeHandler.addEntireArray(rt);
+        if (!tbl.contains("null") && !tbl.contains("{}")) {
+            /*if (tbl.equals("00:00:00")) {
                 edit.putBoolean("previously_started", Boolean.TRUE);
-            }
+                Type type = new TypeToken<HashMap<String, User>>(){}.getType();
+                HashMap<String, User> restoredUserMap = g.fromJson(tbl, type);
+                UserManager.addUserMap(restoredUserMap);
+                edit.apply();
+            }*/
             if (!previouslyStarted) {
                 edit.putBoolean("previously_started", Boolean.TRUE);
-                Type type = new TypeToken<ArrayList<Time>>(){}.getType();
-                ArrayList<Time> rt = g.fromJson(tbl, type);
-                TimeHandler.addEntireArray(rt);
+                Type type = new TypeToken<HashMap<String, User>>(){}.getType();
+                HashMap<String, User> restoredUserMap = g.fromJson(tbl, type);
+                UserManager.addUserMap(restoredUserMap);
                 edit.apply();
             }
         }
-    }
-
-    public void createNewUser(View v){
-        final View popupView = getLayoutInflater().inflate(R.layout.settings_menu_layout, null);
-
-        final PopupWindow pw = new PopupWindow(popupView, ActionBar.LayoutParams.WRAP_CONTENT, ActionBar.LayoutParams.WRAP_CONTENT);
-
-        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        final SharedPreferences.Editor edit = prefs.edit();
-
-        pw.setAnimationStyle(R.style.Fade_Animation);
-
-        pw.setFocusable(true);
-
-        pw.showAtLocation(v, Gravity.CENTER, 0,0);
     }
 }
