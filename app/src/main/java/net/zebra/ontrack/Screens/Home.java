@@ -1,7 +1,6 @@
 package net.zebra.ontrack.Screens;
 
 import android.app.ActionBar;
-import android.os.Looper;
 import android.support.v4.app.Fragment;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -12,7 +11,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.FragmentManager;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,7 +39,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Handler;
 
 /**
  * Created by Zeb on 4/19/17.
@@ -52,7 +49,7 @@ public class Home extends Fragment {
     private TextView startTimeMessage;
     public static boolean isRec, emptyChron, moreThanOnce, autoSave;
     Chronometer chron;
-    private Button resetTime, saveToLog, enterManually;
+    private Button resetTime, resetUsers, saveToLog, enterManually;
     private ImageButton settingsBtn;
     private Spinner userSelect;
     private Switch autoSaveSwitch;
@@ -201,7 +198,7 @@ public class Home extends Fragment {
             Snackbar.make(cl, "No time has been recorded!", Snackbar.LENGTH_SHORT).show();
     }
 
-    public void reset(final View v){
+    public void resetTime(final View v){
         final View popupView = getActivity().getLayoutInflater().inflate(R.layout.reset_time_confirmation, null);
 
         final PopupWindow pw = new PopupWindow(popupView, ActionBar.LayoutParams.WRAP_CONTENT, ActionBar.LayoutParams.WRAP_CONTENT);
@@ -211,7 +208,7 @@ public class Home extends Fragment {
         yes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                TimeManager.resetTime(getActivity());
+                UserManager.getCurrentUser().resetTime(getActivity());
                 pw.dismiss();
                 Snackbar.make(v, "Time has been reset!", Snackbar.LENGTH_SHORT).show();
             }
@@ -231,6 +228,37 @@ public class Home extends Fragment {
         pw.showAtLocation(v, Gravity.CENTER, 0,0);
     }
 
+    public void resetUsers(final View v){
+        final View popupView = getActivity().getLayoutInflater().inflate(R.layout.reset_users_confirmation, null);
+
+        final PopupWindow pw = new PopupWindow(popupView, ActionBar.LayoutParams.WRAP_CONTENT, ActionBar.LayoutParams.WRAP_CONTENT);
+        Button yes = (Button)popupView.findViewById(R.id.reset_users_yes),
+                no = (Button)popupView.findViewById(R.id.reset_users_no);
+
+        yes.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                UserManager.deleteAllUsers();
+                pw.dismiss();
+                Snackbar.make(v, "All users have been deleted!", Snackbar.LENGTH_SHORT).show();
+            }
+        });
+
+        no.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                pw.dismiss();
+            }
+        });
+
+        pw.setAnimationStyle(R.style.Fade_Animation);
+
+        pw.setFocusable(true);
+
+        pw.showAtLocation(v, Gravity.CENTER, 0,0);
+    }
+
+
     public void settings(final View v){
         final View popupView = getActivity().getLayoutInflater().inflate(R.layout.settings_menu_layout, null);
 
@@ -240,7 +268,8 @@ public class Home extends Fragment {
         final SharedPreferences.Editor edit = prefs.edit();
 
         autoSaveSwitch = (Switch)popupView.findViewById(R.id.settings_auto_save);
-        resetTime = (Button)popupView.findViewById(R.id.settings_reset_button);
+        resetTime = (Button)popupView.findViewById(R.id.settings_reset_time_button);
+        resetUsers = (Button)popupView.findViewById(R.id.settings_reset_users_button);
 
 
         autoSaveSwitch.setChecked(prefs.getBoolean("auto_save", Boolean.FALSE));
@@ -264,7 +293,14 @@ public class Home extends Fragment {
         resetTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                reset(v);
+                resetTime(v);
+            }
+        });
+
+        resetUsers.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                resetUsers(v);
             }
         });
 
@@ -277,10 +313,10 @@ public class Home extends Fragment {
 
     public void update(){
 
-        adapter.clear();
+        /*adapter.clear();
         adapter.addAll(UserManager.getUserNames());
         adapter.notifyDataSetChanged();
-        userSelect.setAdapter(adapter);
+        userSelect.setAdapter(adapter);*/
     }
 
     public void initViews(View v){

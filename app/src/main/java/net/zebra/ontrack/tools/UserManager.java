@@ -35,6 +35,10 @@ public class UserManager {
         users.remove(selec);
     }
 
+    public static void deleteAllUsers() {
+        users.clear();
+    }
+
     public static void deleteCurrentUser(){
         users.remove(getCurrentUser().getName());
     }
