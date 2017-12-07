@@ -39,7 +39,6 @@ public class Log extends Fragment{
 
     }
     public void update(){
-
         if (UserManager.getCurrentUser() != null) {
             timeArrayList = UserManager.getCurrentUser().getTimeArray();
             if (timeArrayList != null) {
@@ -51,6 +50,7 @@ public class Log extends Fragment{
 
 
         if (UserManager.getUserList().size() > 0 && timeArrayList != null) {
+            lv.setVisibility(View.VISIBLE);
 
             header = "Logged time for " + UserManager.getCurrentUser().getName();
             tv.setText(header);
@@ -78,6 +78,7 @@ public class Log extends Fragment{
         }
         else {
             header = "No time tracked for this user";
+            lv.setVisibility(View.INVISIBLE);
             tv.setText(header);
         }
         if (needsReversed)
