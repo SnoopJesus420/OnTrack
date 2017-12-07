@@ -65,6 +65,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        UserManager.setCurrentUser(0);
+
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         SharedPreferences.Editor edit = prefs.edit();
         edit.putBoolean("previously_started", Boolean.FALSE);
@@ -91,7 +93,25 @@ public class MainActivity extends AppCompatActivity {
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                if (prevMenuItem != null) {
+                    prevMenuItem.setChecked(false);
+                }
+                else {
+                    navigation.getMenu().getItem(0).setChecked(false);
+                }
+                if (position == 0){
+                    ((Home)fpa.getItem(position)).update();
+                }
+                if (position == 1){
+                    ((Dashboard)fpa.getItem(position)).update();
+                }
+                if (position == 2){
+                    ((Log)fpa.getItem(position)).update();
+                }
 
+                navigation.getMenu().getItem(position).setChecked(true);
+
+                prevMenuItem = navigation.getMenu().getItem(position);
             }
 
             @Override
@@ -149,6 +169,7 @@ public class MainActivity extends AppCompatActivity {
         Gson g = new Gson();
         tbl = prefs.getString("timeBeforeLeave", "{}");
         System.out.println(tbl);
+        UserManager.setCurrentUser(0);
         if (!tbl.contains("null") && !tbl.contains("{}")) {
             /*if (tbl.equals("00:00:00")) {
                 edit.putBoolean("previously_started", Boolean.TRUE);

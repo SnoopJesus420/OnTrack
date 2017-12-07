@@ -1,7 +1,6 @@
 package net.zebra.ontrack.Screens;
 
 import android.app.ActionBar;
-import android.os.Looper;
 import android.support.v4.app.Fragment;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -12,7 +11,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.FragmentManager;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,7 +39,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Handler;
 
 /**
  * Created by Zeb on 4/19/17.
@@ -52,7 +49,7 @@ public class Home extends Fragment {
     private TextView startTimeMessage;
     public static boolean isRec, emptyChron, moreThanOnce, autoSave;
     Chronometer chron;
-    private Button resetTime, saveToLog, enterManually;
+    private Button userManage, saveToLog, enterManually;
     private ImageButton settingsBtn;
     private Spinner userSelect;
     private Switch autoSaveSwitch;
@@ -68,6 +65,7 @@ public class Home extends Fragment {
         final CoordinatorLayout cl = (CoordinatorLayout)v.findViewById(R.id.home_coordinator);
         userSelect = (Spinner)v.findViewById(R.id.select_profile);
 
+        UserManager.setCurrentUser(0);
 
         adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, UserManager.getUserNames());
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -158,8 +156,8 @@ public class Home extends Fragment {
             }
         });
 
-        resetTime.setText("Manage Users");
-        resetTime.setOnClickListener(new View.OnClickListener() {
+        userManage.setText("Manage Users");
+        userManage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 manageUsers(cl);
@@ -240,7 +238,7 @@ public class Home extends Fragment {
         final SharedPreferences.Editor edit = prefs.edit();
 
         autoSaveSwitch = (Switch)popupView.findViewById(R.id.settings_auto_save);
-        resetTime = (Button)popupView.findViewById(R.id.settings_reset_button);
+        userManage = (Button)popupView.findViewById(R.id.settings_reset_button);
 
 
         autoSaveSwitch.setChecked(prefs.getBoolean("auto_save", Boolean.FALSE));
@@ -261,7 +259,7 @@ public class Home extends Fragment {
             }
         });
 
-        resetTime.setOnClickListener(new View.OnClickListener() {
+        userManage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 reset(v);
@@ -276,11 +274,11 @@ public class Home extends Fragment {
     }
 
     public void update(){
-
+        String oldUser = UserManager.getCurrentUser().getName();
         adapter.clear();
         adapter.addAll(UserManager.getUserNames());
         adapter.notifyDataSetChanged();
-        userSelect.setAdapter(adapter);
+        UserManager.setCurrentUser(oldUser);
     }
 
     public void initViews(View v){
@@ -289,7 +287,7 @@ public class Home extends Fragment {
         startBtn = (FloatingActionButton)v.findViewById(R.id.start_button);
         stopBtn = (FloatingActionButton)v.findViewById(R.id.stop_button);
 
-        resetTime = (Button)v.findViewById(R.id.manage_users);
+        userManage = (Button)v.findViewById(R.id.manage_users);
         saveToLog = (Button)v.findViewById(R.id.save);
         enterManually = (Button)v.findViewById(R.id.enter_manually);
         settingsBtn = (ImageButton)v.findViewById(R.id.settings_button);
@@ -320,7 +318,6 @@ public class Home extends Fragment {
                     UserManager.setCurrentUser(userName.getText().toString());
                     update();
                     pw.dismiss();
-                    pw.dismiss();
                 }
             }
         });
@@ -341,8 +338,13 @@ public class Home extends Fragment {
         final SharedPreferences.Editor edit = prefs.edit();
 
         Spinner userManage = (Spinner)popupView.findViewById(R.id.manage_user_spinner);
-        Button removeSelectedUser = (Button)popupView.findViewById(R.id.remove_user_button);
+        Button removeUser = (Button)popupView.findViewById(R.id.remove_user_button);
         Button createNewUser = (Button)popupView.findViewById(R.id.create_user_button);
+
+
+        if (UserManager.getUserList().size() > 0){
+            UserManager.selectUser(UserManager.getUserList().get(0).getName());
+        }
 
         adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, UserManager.getUserNames());
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -351,7 +353,7 @@ public class Home extends Fragment {
         userManage.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                UserManager.setCurrentUser(adapterView.getItemAtPosition(i).toString());
+                UserManager.selectUser(adapterView.getItemAtPosition(i).toString());
             }
 
             @Override
@@ -360,17 +362,16 @@ public class Home extends Fragment {
             }
         });
 
-        removeSelectedUser.setOnClickListener(new View.OnClickListener() {
+        removeUser.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                UserManager.deleteCurrentUser();
-                Toast.makeText(getActivity(), "Deleted", Toast.LENGTH_SHORT).show();
-                adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, UserManager.getUserNames());
-                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                userSelect.setAdapter(adapter);
-                if (UserManager.getUserList().size() > 0)
-                UserManager.setCurrentUser(UserManager.getUserList().get(0).getName());
-                else createNewUser(v);
+                Toast.makeText(getActivity(), UserManager.deleteSelectedUser(), Toast.LENGTH_SHORT).show();
+                UserManager.selectUser(0);
+                adapter.clear();
+                adapter.addAll(UserManager.getUserNames());
+                adapter.notifyDataSetChanged();
+                if (UserManager.getUserList().size() == 0)
+                    createNewUser(v);
 
             }
         });
@@ -381,8 +382,6 @@ public class Home extends Fragment {
                 createNewUser(v);
             }
         });
-
-
 
         pw.setAnimationStyle(R.style.Fade_Animation);
 
