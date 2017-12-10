@@ -20,6 +20,7 @@ import android.widget.TextView;
 import net.zebra.ontrack.R;
 import net.zebra.ontrack.tools.TimeManager;
 import net.zebra.ontrack.tools.Time;
+import net.zebra.ontrack.tools.UserManager;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -33,9 +34,12 @@ public class EnterManually extends Activity {
     private TextView timeView, dateView, headerView;
     private Button enterTime, enterDate;
     public Button setButton, saveButton, cancelButton, todayButton;
-    public String hours, mins, secs;
+    public int hours, mins, secs;
     public String totalTime, totalDate;
     private int size = 2;
+    private boolean alreadyClearedHours;
+    private boolean alreadyClearedMins;
+    private boolean alreadyClearedSecs;
 
     public void initViews(){
         headerView = (TextView)findViewById(R.id.header);
@@ -103,8 +107,8 @@ public class EnterManually extends Activity {
                     Snackbar.make(cl, "Please enter a Time", Snackbar.LENGTH_SHORT).show();
                 }
                 else {
-                    Time manual = new Time(Integer.parseInt(hours), Integer.parseInt(mins), Integer.parseInt(secs), totalDate);
-                    TimeManager.addTimeToList(manual);
+                    Time manual = new Time(hours, mins, secs, totalDate);
+                    UserManager.getCurrentUser().addTimeToList(manual);
                     finish();
                 }
 
@@ -176,13 +180,22 @@ public class EnterManually extends Activity {
         setButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if(hh.getText().toString().isEmpty()){
+                    hh.setText("00");
+                }
+                if(mm.getText().toString().isEmpty()){
+                    mm.setText("00");
+                }
+                if(ss.getText().toString().isEmpty()){
+                    ss.setText("00");
+                }
+                hours = Integer.parseInt(hh.getText().toString());
+                mins = Integer.parseInt(mm.getText().toString());
+                secs = Integer.parseInt(ss.getText().toString());
 
-                totalTime = hh.getText().toString() + ":" + mm.getText().toString() + ":" + ss.getText().toString();
-                hours = hh.getText().toString();
-                mins = mm.getText().toString();
-                secs = ss.getText().toString();
+                totalTime = hours + ":" + mins + ":" + secs;
 
-                if (!hours.isEmpty() && !mins.isEmpty() && !secs.isEmpty()){
+                if (!hh.getText().toString().isEmpty() && !mm.getText().toString().isEmpty() && !ss.getText().toString().isEmpty()){
                     String tot = "Time: " + totalTime;
                     timeView.setText(tot);
                     pw.dismiss();

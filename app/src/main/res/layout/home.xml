@@ -17,33 +17,44 @@
             android:layout_alignParentStart="true">
 
 
-            <ImageButton
-                android:id="@+id/settings_button"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_gravity="bottom|left"
-                android:layout_marginBottom="25dp"
-                android:layout_marginLeft="25dp"
-                android:background="@android:color/transparent"
-                android:scaleType="fitXY"
-                app:srcCompat="@drawable/ic_settings" />
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_behavior="net.zebra.ontrack.tools.FloatingActionButtonBehavior">
 
-            <TextView
-                android:id="@+id/profile_header"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|center"
-                android:layout_marginBottom="60dp"
-                android:layout_marginRight="68dp"
-                android:text="User:"
-                android:textSize="18sp" />
+                <Spinner
+                    android:id="@+id/select_profile"
+                    android:layout_width="175dp"
+                    android:layout_height="35dp"
+                    android:layout_gravity="bottom|center"
+                    android:layout_alignTop="@+id/settings_button"
+                    android:layout_centerHorizontal="true" />
 
-            <Spinner
-                android:id="@+id/select_profile"
-                android:layout_width="125dp"
-                android:layout_height="35dp"
-                android:layout_gravity="bottom|center"
-                android:layout_marginBottom="25dp" />
+                <TextView
+                    android:id="@+id/profile_header"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|center"
+                    android:layout_marginRight="68dp"
+                    android:text="User:"
+                    android:textSize="18sp"
+                    android:layout_above="@+id/select_profile"
+                    android:layout_centerHorizontal="true" />
+
+                <ImageButton
+                    android:id="@+id/settings_button"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_gravity="bottom|left"
+                    android:layout_marginBottom="13dp"
+                    android:layout_marginLeft="25dp"
+                    android:background="@android:color/transparent"
+                    android:scaleType="fitXY"
+                    app:srcCompat="@drawable/ic_settings"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginStart="14dp" />
+            </RelativeLayout>
 
             <Switch
                 android:id="@+id/auto_save"
@@ -109,7 +120,7 @@
                 <Button
                     android:id="@+id/enter_manually"
                     style="@style/Widget.AppCompat.Button.Borderless.Colored"
-                    android:layout_width="165dp"
+                    android:layout_width="145dp"
                     android:layout_height="wrap_content"
                     android:layout_alignBaseline="@+id/manage_users"
                     android:layout_alignBottom="@+id/manage_users"

@@ -49,7 +49,7 @@ public class Home extends Fragment {
     private TextView startTimeMessage;
     public static boolean isRec, emptyChron, moreThanOnce, autoSave;
     Chronometer chron;
-    private Button userManage, saveToLog, enterManually;
+    private Button reset, saveToLog, enterManually;
     private ImageButton settingsBtn;
     private Spinner userSelect;
     private Switch autoSaveSwitch;
@@ -61,9 +61,9 @@ public class Home extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        final View v = inflater.inflate(R.layout.home,container, false);
-        final CoordinatorLayout cl = (CoordinatorLayout)v.findViewById(R.id.home_coordinator);
-        userSelect = (Spinner)v.findViewById(R.id.select_profile);
+        final View v = inflater.inflate(R.layout.home, container, false);
+        final CoordinatorLayout cl = (CoordinatorLayout) v.findViewById(R.id.home_coordinator);
+        userSelect = (Spinner) v.findViewById(R.id.select_profile);
 
         UserManager.setCurrentUser(0);
 
@@ -123,12 +123,11 @@ public class Home extends Fragment {
                 long seconds = TimeUnit.MILLISECONDS.toSeconds(elapsedMillis);
                 timeWhenStopped = chron.getBase() - SystemClock.elapsedRealtime();
 
-                getTime = new Time((int) seconds , new SimpleDateFormat("MM/dd/yy").format(new Date()));
-                if (autoSave){
+                getTime = new Time((int) seconds, new SimpleDateFormat("MM/dd/yy").format(new Date()));
+                if (autoSave) {
                     chron.stop();
                     save(cl);
-                }
-                else
+                } else
                     chron.stop();
 
                 stopBtn.hide();
@@ -156,8 +155,8 @@ public class Home extends Fragment {
             }
         });
 
-        userManage.setText("Manage Users");
-        userManage.setOnClickListener(new View.OnClickListener() {
+        reset.setText("Manage Users");
+        reset.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 manageUsers(cl);
@@ -203,8 +202,11 @@ public class Home extends Fragment {
         final View popupView = getActivity().getLayoutInflater().inflate(R.layout.reset_time_confirmation, null);
 
         final PopupWindow pw = new PopupWindow(popupView, ActionBar.LayoutParams.WRAP_CONTENT, ActionBar.LayoutParams.WRAP_CONTENT);
+        TextView resetHeader = (TextView)popupView.findViewById(R.id.reset_text_header);
         Button yes = (Button)popupView.findViewById(R.id.reset_yes),
                 no = (Button)popupView.findViewById(R.id.reset_no);
+
+        resetHeader.setText("Are you sure you want to reset your logged time for " + UserManager.getCurrentUser().getName() + "? (This action cannot be undone)");
 
         yes.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -238,7 +240,7 @@ public class Home extends Fragment {
         final SharedPreferences.Editor edit = prefs.edit();
 
         autoSaveSwitch = (Switch)popupView.findViewById(R.id.settings_auto_save);
-        userManage = (Button)popupView.findViewById(R.id.settings_reset_button);
+        reset = (Button)popupView.findViewById(R.id.settings_reset_time_button);
 
 
         autoSaveSwitch.setChecked(prefs.getBoolean("auto_save", Boolean.FALSE));
@@ -259,8 +261,7 @@ public class Home extends Fragment {
             }
         });
 
-        userManage.setOnClickListener(new View.OnClickListener() {
-            @Override
+        reset.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 reset(v);
             }
@@ -274,11 +275,11 @@ public class Home extends Fragment {
     }
 
     public void update(){
-        String oldUser = UserManager.getCurrentUser().getName();
+
         adapter.clear();
         adapter.addAll(UserManager.getUserNames());
         adapter.notifyDataSetChanged();
-        UserManager.setCurrentUser(oldUser);
+
     }
 
     public void initViews(View v){
@@ -287,7 +288,7 @@ public class Home extends Fragment {
         startBtn = (FloatingActionButton)v.findViewById(R.id.start_button);
         stopBtn = (FloatingActionButton)v.findViewById(R.id.stop_button);
 
-        userManage = (Button)v.findViewById(R.id.manage_users);
+        reset = (Button)v.findViewById(R.id.manage_users);
         saveToLog = (Button)v.findViewById(R.id.save);
         enterManually = (Button)v.findViewById(R.id.enter_manually);
         settingsBtn = (ImageButton)v.findViewById(R.id.settings_button);
@@ -317,6 +318,7 @@ public class Home extends Fragment {
                 if (u.equals("Created!")) {
                     UserManager.setCurrentUser(userName.getText().toString());
                     update();
+                    userSelect.setAdapter(adapter);
                     pw.dismiss();
                 }
             }

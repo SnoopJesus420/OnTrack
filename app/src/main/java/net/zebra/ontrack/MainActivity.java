@@ -34,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
     public String tbl;
     private ViewPager viewPager;
     private MenuItem prevMenuItem;
+    public static String paused;
 
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -64,8 +65,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        UserManager.setCurrentUser(0);
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         SharedPreferences.Editor edit = prefs.edit();
@@ -169,7 +168,6 @@ public class MainActivity extends AppCompatActivity {
         Gson g = new Gson();
         tbl = prefs.getString("timeBeforeLeave", "{}");
         System.out.println(tbl);
-        UserManager.setCurrentUser(0);
         if (!tbl.contains("null") && !tbl.contains("{}")) {
             /*if (tbl.equals("00:00:00")) {
                 edit.putBoolean("previously_started", Boolean.TRUE);
